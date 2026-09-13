@@ -40,7 +40,7 @@ The walkthrough uses **sample demo data**, not a live Airtable base or Ghost sit
 
 The video above uses sample data. Below is the same extension running against a **live** Airtable base and a real Ghost site — the panel docked inside Ghost Admin, with an approved opportunity already rendered into the Newsletter page.
 
-![Opportunities panel running live inside Ghost Admin](output/screenshots/live-panel-ghost-admin.png)
+![Opportunities panel running live inside Ghost Admin](output/video/live-panel-ghost-admin.png)
 
 Verified through the server API at the time of capture:
 
@@ -355,7 +355,7 @@ demo/        Local editorial workspace hosting the real panel
 tests/       Automated server, domain, and adapter coverage
 scripts/     check and package helpers
 output/      Demo video, captions, voiceover, poster,
-             and live screenshots
+             live screenshot
 .env.example Configuration reference
 ```
 
@@ -368,3 +368,4 @@ output/      Demo video, captions, voiceover, poster,
 - [Airtable personal access tokens](https://support.airtable.com/articles/9934989703-creating-personal-access-tokens)
 - [Ghost Lexical posts](https://docs.ghost.org/admin-api/posts/overview)
 - [Ghost collision-safe post updates](https://docs.ghost.org/admin-api/posts/updating-a-post)
+
