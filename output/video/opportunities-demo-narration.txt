@@ -1,0 +1,17 @@
+Meet Opportunities, your private editorial companion inside Ghost.
+
+Connect using your server address, Ghost site, and editor token. Airtable and Ghost credentials stay on the server.
+
+Review the latest eight opportunities. Search, filter, check sources, approve, reject, or reopen an item for another review.
+
+Edit titles, descriptions, deadlines, categories, and links, then save your changes back to Airtable.
+
+Add approved opportunities to a draft, preserving existing content. Approvals can also sync automatically to a configured Ghost page.
+
+Need a replacement? Swap in another approved opportunity. Only that card changes; your other editorial content stays intact.
+
+Type reject Globex, review the proposed action, and confirm. These are simple commands, not full AI chat.
+
+The activity feed tracks changes. Refresh for updates, collapse the panel, or disconnect your session.
+
+Extension, server, Airtable and Ghost. This demo uses sample data. Live connections need your credentials.
