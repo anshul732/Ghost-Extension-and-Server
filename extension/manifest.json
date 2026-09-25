@@ -38,7 +38,13 @@
         "panel.css",
         "panel.js",
         "bridge.js",
-        "review.js"
+        "review.js",
+        "assets/ijnet-logo.png",
+        "fonts/Lato-Regular.woff",
+        "fonts/Lato-Bold.woff",
+        "fonts/PlayfairDisplay-Regular.woff",
+        "fonts/PlayfairDisplay-Bold.woff",
+        "fonts/PlayfairDisplay-Black.woff"
       ],
       "matches": [
         "https://*/*",

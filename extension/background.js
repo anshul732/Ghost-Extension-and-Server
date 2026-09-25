@@ -1,4 +1,4 @@
-const defaults = { serverUrl: 'http://localhost:8787', ghostUrl: 'http://localhost:8787/mock-ghost/' };
+const defaults = { serverUrl: '', ghostUrl: '' };
 const settings = async () => ({ ...defaults, ...(await chrome.storage.local.get('settings')).settings });
 function validUrl(value, ghost = false) {
   const url = new URL(value);
@@ -18,7 +18,9 @@ chrome.runtime.onInstalled.addListener(async () => {
   await chrome.runtime.openOptionsPage();
 });
 chrome.action.onClicked.addListener(async tab => {
-  const config = await settings(); const ghost = new URL(config.ghostUrl);
+  const config = await settings();
+  if (!config.ghostUrl) return chrome.runtime.openOptionsPage();
+  const ghost = new URL(config.ghostUrl);
   if (!tab.id || !tab.url?.startsWith(ghost.origin + (ghost.pathname.startsWith('/mock-ghost') ? '/mock-ghost/' : '/ghost/'))) return chrome.runtime.openOptionsPage();
   try { await chrome.tabs.sendMessage(tab.id, { type: 'toggle-panel' }); }
   catch { try { await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] }); } catch { await chrome.runtime.openOptionsPage(); } }

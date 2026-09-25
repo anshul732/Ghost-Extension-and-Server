@@ -4,7 +4,8 @@ const $ = selector => document.querySelector(selector);
 const state = { records: [], drafts: [], activity: [], filter: 'pending', search: '', draftId: '', busy: false, connected: false, approvalPostId: null, editId: null, editRevision: null, swapId: null, confirm: null };
 const el = (tag, cls, text) => { const node = document.createElement(tag); if (cls) node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 const selectedDraft = () => state.drafts.find(d => d.id === state.draftId);
-const inDraft = id => selectedDraft()?.recordIds.includes(id) || false;
+const draftTitles = () => selectedDraft()?.opportunityTitles || [];
+const inDraft = id => draftTitles().includes(state.records.find(r => r.id === id)?.title);
 const formatDate = date => { const d = new Date(date + 'T12:00:00'); return Number.isNaN(d.valueOf()) ? 'No deadline' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
 function notify(text, error = false) { const n = $('#notice'); n.textContent = text; n.className = `notice${error ? ' error' : ''}`; n.hidden = !text; }
 async function load(quiet = false) {
@@ -64,15 +65,15 @@ function render() {
   const select = $('#draft'); select.replaceChildren();
   if (!state.drafts.length) { const o = el('option', '', 'No connected drafts'); o.value = ''; select.append(o); }
   state.drafts.forEach(d => { const o = el('option', '', d.title); o.value = d.id; select.append(o); }); select.value = state.draftId;
-  $('#draft-count').textContent = `${selectedDraft()?.recordIds.length || 0} selected`;
+  $('#draft-count').textContent = `${draftTitles().length} selected`;
   const matches = (r, f) => f === 'all' || (f === 'in-draft' ? inDraft(r.id) : r.status === f);
   document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b.dataset.filter === state.filter); b.querySelector('span').textContent = (b.dataset.filter === 'pending' ? latestReview(state.records) : state.records.filter(r => matches(r, b.dataset.filter))).length; });
   const pool = state.filter === 'pending' ? latestReview(state.records) : state.records;
   const records = pool.filter(r => matches(r, state.filter) && `${r.title} ${r.organization} ${r.summary} ${r.category}`.toLowerCase().includes(state.search));
   $('#list-label').textContent = ({ pending: 'LATEST 8 · AWAITING REVIEW', approved: 'READY FOR YOUR READERS', all: 'THE FULL COLLECTION', 'in-draft': 'YOUR EDITORIAL SELECTION' })[state.filter];
   $('#list-count').textContent = `${records.length} ${records.length === 1 ? 'opportunity' : 'opportunities'}`;
-  $('#records').replaceChildren(...(records.length ? records.map(card) : [el('div', 'empty', state.search ? 'No matches yet. Try another name or keyword.' : state.filter === 'pending' ? 'All caught up. Your next good thing will appear here.' : state.filter === 'in-draft' ? 'Your draft is a blank canvas. Add an approved opportunity to get started.' : 'Nothing here yet. Review the pending opportunities to get started.')]));
-  $('#activity').replaceChildren(...(state.activity.length ? state.activity.map(a => { const row = el('div', 'activity-item'); const info = el('div'); info.append(el('p', '', a.description), el('small', '', `${a.editor} · ${new Date(a.at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`)); row.append(el('span', 'activity-dot', '✓'), info); return row; }) : [el('div', 'empty', 'A fresh start. Your team’s changes will show up here.')]));
+  $('#records').replaceChildren(...(records.length ? records.map(card) : [el('div', 'empty', state.search ? 'No matching opportunities.' : state.filter === 'pending' ? 'No opportunities awaiting review.' : state.filter === 'in-draft' ? 'No opportunities in this draft. Add an approved opportunity.' : 'No opportunities in this view.')]));
+  $('#activity').replaceChildren(...(state.activity.length ? state.activity.map(a => { const row = el('div', 'activity-item'); const info = el('div'); info.append(el('p', '', a.description), el('small', '', `${a.editor} · ${new Date(a.at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`)); row.append(el('span', 'activity-dot', '✓'), info); return row; }) : [el('div', 'empty', 'No recent activity.')]));
 }
 function openEdit(record) {
   state.editId = record.id; state.editRevision = record.revision;

@@ -49,11 +49,11 @@ export function ghostAdapter(config, fetcher) {
   return {
     async list() { return (await request('posts/?filter=status%3Adraft&limit=100&formats=lexical')).posts; },
     async get(id, resource = 'posts') { assert(['posts','pages'].includes(resource), 400, 'Invalid Ghost resource.'); return (await request(`${resource}/${encodeURIComponent(id)}/?formats=lexical`))[resource][0]; },
-    async putOpportunity(id, record, removeId, options = {}) {
+    async putOpportunity(id, record, remove, options = {}) {
       for (let attempt = 0; attempt < 2; attempt++) {
         const resource = options.resource || 'posts';
         const post = await this.get(id, resource);
-        const lexical = patchDraft(post, record, removeId, options);
+        const lexical = patchDraft(post, record, remove, options);
         if (!lexical) return post;
         try { return (await request(`${resource}/${encodeURIComponent(id)}/?save_revision=true`, { method: 'PUT', body: JSON.stringify({ [resource]: [{ lexical, updated_at: post.updated_at }] }) }))[resource][0]; }
         catch (error) { if (error.status !== 409 || attempt) throw error; }

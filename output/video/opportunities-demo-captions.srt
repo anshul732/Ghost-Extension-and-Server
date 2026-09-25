@@ -1,0 +1,37 @@
+1
+00:00:00,000 --> 00:00:04,000
+Meet Opportunities, your private editorial companion inside Ghost.
+
+2
+00:00:04,000 --> 00:00:12,000
+Connect using your server address, Ghost site, and editor token. Airtable and Ghost credentials stay on the server.
+
+3
+00:00:12,000 --> 00:00:20,000
+Review the latest eight opportunities. Search, filter, check sources, approve, reject, or reopen an item for another review.
+
+4
+00:00:20,000 --> 00:00:27,000
+Edit titles, descriptions, deadlines, categories, and links, then save your changes back to Airtable.
+
+5
+00:00:27,000 --> 00:00:35,000
+Add approved opportunities to a draft, preserving existing content. Approvals can also sync automatically to a configured
+Ghost page.
+
+6
+00:00:35,000 --> 00:00:42,000
+Need a replacement? Swap in another approved opportunity. Only that card changes; your other editorial content stays
+intact.
+
+7
+00:00:42,000 --> 00:00:48,000
+Type reject Globex, review the proposed action, and confirm. These are simple commands, not full AI chat.
+
+8
+00:00:48,000 --> 00:00:54,000
+The activity feed tracks changes. Refresh for updates, collapse the panel, or disconnect your session.
+
+9
+00:00:54,000 --> 00:01:00,000
+Extension, server, Airtable and Ghost. This demo uses sample data. Live connections need your credentials.

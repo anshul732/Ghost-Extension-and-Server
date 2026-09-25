@@ -5,7 +5,7 @@
   host.id = 'opportunities-extension-root';
   const shadow = host.attachShadow({ mode: 'closed' });
   const style = document.createElement('style');
-  style.textContent = ':host{all:initial!important;position:fixed!important;inset:0 0 0 auto!important;width:min(440px,100vw)!important;height:100dvh!important;z-index:2147483646!important;display:block!important;box-shadow:-10px 0 50px #1112!important}iframe{border:0;width:100%;height:100%;display:block;background:#faf9f6}.handle{position:absolute;left:-34px;top:110px;width:34px;height:52px;border:1px solid #dedbd3;border-right:0;border-radius:10px 0 0 10px;background:#faf9f6;color:#363b32;cursor:pointer;font:20px system-ui}.hidden{display:none}:host(.collapsed){width:0!important}';
+  style.textContent = ':host{all:initial!important;position:fixed!important;inset:0 0 0 auto!important;width:min(440px,100vw)!important;height:100dvh!important;z-index:2147483646!important;display:block!important;box-shadow:-10px 0 50px #1112!important}iframe{border:0;width:100%;height:100%;display:block;background:#ffffff}.handle{position:absolute;left:-34px;top:110px;width:34px;height:52px;border:1px solid #d7dce3;border-right:0;border-radius:10px 0 0 10px;background:#ffffff;color:#007fab;cursor:pointer;font:20px system-ui}.hidden{display:none}:host(.collapsed){width:0!important}';
   const frame = document.createElement('iframe'); frame.src = chrome.runtime.getURL('panel.html'); frame.title = 'Opportunities editor panel';
   const button = document.createElement('button'); button.className = 'handle'; button.textContent = '›'; button.setAttribute('aria-label', 'Collapse opportunities panel');
   let open = true;

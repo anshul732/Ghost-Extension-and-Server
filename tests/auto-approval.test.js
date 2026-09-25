@@ -4,7 +4,7 @@ import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createApp} from '../server/app.js';
-import {patchDraft,draftRecordIds,revision,HttpError} from '../server/domain.js';
+import {patchDraft,draftOpportunityTitles,revision,HttpError} from '../server/domain.js';
 import {seed} from '../server/store.js';
 test('approval adds to configured published post before approving Airtable; retries do not duplicate',async t=>{
  const dir=await mkdtemp(join(tmpdir(),'auto-approval-'));
@@ -19,8 +19,9 @@ test('approval adds to configured published post before approving Airtable; retr
  assert.equal((await request('approval-request-one')).status,502);assert.equal(row.status,'pending');
  fail=false;failAir=true;assert.equal((await request('approval-request-one')).status,409);assert.equal(row.status,'pending');
  assert.equal((await request('approval-request-one')).status,200);assert.equal(row.status,'approved');
- assert.deepEqual(draftRecordIds(post),[row.id]);const nodes=JSON.parse(post.lexical).root.children;assert.deepEqual(nodes[0],original);
- assert.equal(nodes.filter(n=>n.html?.includes('<h2>Opportunity</h2><hr>')).length,1);
- assert.ok(nodes.at(-1).html.includes('Deadline: 2026-10-15'));assert.ok(nodes.at(-1).html.includes('https://example.com/opportunities'));
+ assert.deepEqual(draftOpportunityTitles(post),[row.title]);const nodes=JSON.parse(post.lexical).root.children;assert.deepEqual(nodes[0],original);
+ assert.equal(nodes.filter(n=>n.tag==='h2'&&(n.children||[]).map(c=>c.text).join('')==='Opportunity').length,1);
+ assert.equal(nodes.filter(n=>n.type==='html').length,0);
+ const tail=JSON.stringify(nodes.slice(-3));assert.ok(tail.includes('Deadline: 2026-10-15'));assert.ok(tail.includes('https://example.com/opportunities'));
  assert.throws(()=>patchDraft({...post,id:'different'},initial.records[1],undefined,{approvalPostId:post.id}),{status:409});
 });

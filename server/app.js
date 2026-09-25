@@ -3,13 +3,13 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, extname } from 'node:path';
-import { HttpError, assert, draftRecordIds, parseCommand, revision, safeId, validatePatch } from './domain.js';
+import { HttpError, assert, draftOpportunityTitles, parseCommand, revision, safeId, validatePatch } from './domain.js';
 import { airtableAdapter, ghostAdapter } from './adapters.js';
 import { createStore, demoAdapters } from './store.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sameToken = (a, b) => typeof a === 'string' && typeof b === 'string' && Buffer.byteLength(a) === Buffer.byteLength(b) && timingSafeEqual(Buffer.from(a), Buffer.from(b));
-const summarizeDraft = d => ({ id: d.id, title: d.title, status: d.status, updatedAt: d.updated_at, recordIds: draftRecordIds(d) });
+const summarizeDraft = d => ({ id: d.id, title: d.title, status: d.status, updatedAt: d.updated_at, opportunityTitles: draftOpportunityTitles(d) });
 async function body(req) {
   let length = 0; const chunks = [];
   for await (const chunk of req) { length += chunk.length; assert(length <= 32768, 413, 'Request too large.'); chunks.push(chunk); }
@@ -46,11 +46,11 @@ export async function createApp(config = {}) {
       if (!url.pathname.startsWith('/api/')) {
         assert(demo && req.method === 'GET', 404, 'Not found.');
         if (url.pathname === '/favicon.ico') { res.writeHead(204); res.end(); return; }
-        const files = { '/': 'demo/index.html', '/mock-ghost/': 'demo/index.html', '/demo.js': 'demo/demo.js', '/demo.css': 'demo/demo.css', '/panel.html': 'extension/panel.html', '/panel.css': 'extension/panel.css', '/panel.js': 'extension/panel.js', '/bridge.js': 'extension/bridge.js', '/review.js': 'extension/review.js' };
+        const files = { '/': 'demo/index.html', '/mock-ghost/': 'demo/index.html', '/demo.js': 'demo/demo.js', '/demo.css': 'demo/demo.css', '/panel.html': 'extension/panel.html', '/panel.css': 'extension/panel.css', '/panel.js': 'extension/panel.js', '/bridge.js': 'extension/bridge.js', '/review.js': 'extension/review.js', '/assets/ijnet-logo.png': 'extension/assets/ijnet-logo.png', '/fonts/Lato-Regular.woff': 'extension/fonts/Lato-Regular.woff', '/fonts/Lato-Bold.woff': 'extension/fonts/Lato-Bold.woff', '/fonts/PlayfairDisplay-Regular.woff': 'extension/fonts/PlayfairDisplay-Regular.woff', '/fonts/PlayfairDisplay-Bold.woff': 'extension/fonts/PlayfairDisplay-Bold.woff', '/fonts/PlayfairDisplay-Black.woff': 'extension/fonts/PlayfairDisplay-Black.woff' };
         const path = files[url.pathname]; assert(path, 404, 'Not found.');
         res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self'");
         const data = await readFile(resolve(root, path));
-        res.writeHead(200, { 'Content-Type': ({ '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' })[extname(path)] }); res.end(data); return;
+        res.writeHead(200, { 'Content-Type': ({ '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.woff': 'font/woff' })[extname(path)] }); res.end(data); return;
       }
       const token = req.headers.authorization?.replace(/^Bearer /, '');
       const editor = Object.keys(tokens).find(name => sameToken(tokens[name], token));
@@ -104,7 +104,9 @@ export async function createApp(config = {}) {
           const id = safeId(draftMatch[1]); const record = await airtable.get(safeId(input.recordId));
           assert(record.status === 'approved', 409, 'Approve the opportunity before adding it to a draft.');
           const removeId = draftMatch[2] === 'swap' ? safeId(input.removeId) : undefined;
-          execute = async () => ({ draft: summarizeDraft(await ghost.putOpportunity(id, record, removeId)) });
+          // Blocks are matched by title, so the replaced record is resolved before writing.
+          const remove = removeId ? await airtable.get(removeId) : undefined;
+          execute = async () => ({ draft: summarizeDraft(await ghost.putOpportunity(id, record, remove)) });
           description = removeId ? `Swapped an opportunity for ${record.title}` : `Added ${record.title} to draft`;
         }
         store.state.operations[key] = { fingerprint, approvalPostId, startedAt: new Date().toISOString() };

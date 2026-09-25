@@ -1,1 +1,14 @@
-body{background:#f0f1e9}.setup{max-width:500px;margin:50px auto;padding:38px;background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 60px #2d402507}.setup-eyebrow{margin-top:40px}h1{font-size:43px;line-height:1.1;margin:16px 0}.setup-intro{font-size:12px;line-height:1.8;color:#838b7b;margin-bottom:27px}label{display:block;font-size:11px;font-weight:600;margin-top:21px;color:#55664b}input{display:block;width:100%;padding:12px;margin:8px 0;border:1px solid #dce0d2;border-radius:6px;background:#fff;font-size:12px}small{display:block;font-size:10px;color:#8b9182;line-height:1.7}#connect{width:100%;margin-top:24px;padding:13px;font-size:12px}#setup-status{margin-top:18px;margin-bottom:0}.demo-note{padding:18px;background:#eff1e9;border:1px solid #e0e4d7;border-radius:8px;margin:24px 0 12px;color:#6d7b61;font-size:11px;line-height:1.7}.demo-note p{margin:6px 0 0}.demo-note a{color:#486044}.demo-note code{font-size:10px}#disconnect{display:block;margin:auto}@media(max-width:550px){.setup{margin:15px;padding:25px}}
+body{background:#f6f6f9}
+.setup{max-width:520px;margin:48px auto;padding:36px 38px 26px;background:#fff;border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:6px;box-shadow:0 8px 32px #24242406}
+.setup .brand-logo{width:min(100%,300px)}
+.setup-eyebrow{margin-top:34px}
+h1{font-size:34px;line-height:1.12;margin:13px 0 12px;max-width:360px}
+.setup-intro{font-size:13px;line-height:1.6;color:var(--muted);margin-bottom:27px}
+label{display:block;font-size:12px;font-weight:600;margin-top:22px;color:var(--ink)}
+input{display:block;width:100%;padding:12px;margin:8px 0;border:1px solid #d7dce3;border-radius:4px;background:#fff;font-size:13px;color:var(--ink)}
+input::placeholder{color:#7b818c}
+small{display:block;font-size:11px;color:var(--muted);line-height:1.6}
+#connect{width:100%;margin-top:26px;padding:13px;font-size:13px;font-weight:600}
+#setup-status{margin-top:18px;margin-bottom:0}
+#disconnect{display:block;margin:17px auto 0;font-size:11px}
+@media(max-width:550px){.setup{margin:16px;padding:26px 23px 20px}h1{font-size:30px}}

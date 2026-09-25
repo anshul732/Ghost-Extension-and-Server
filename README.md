@@ -49,7 +49,7 @@ Verified through the server API at the time of capture:
 | Airtable records | **221** — `unknown` 170, `pending` 48, `approved` 2, `rejected` 1 |
 | Panel review queue | Latest **8** awaiting review |
 | Ghost target | Page **"Newsletter"**, status `draft` |
-| Opportunity cards embedded | **1** — `recIQ9zWAzGs2zyP6`, wrapped in `<!-- opp:… -->` / `<!-- /opp:… -->` |
+| Opportunities embedded | **2** — matched by heading title under the `Opportunity` section |
 
 The Airtable-to-Ghost round trip, from the activity feed and Ghost's own `updated_at`:
 
@@ -212,7 +212,11 @@ Use the Admin origin with no `/ghost/` suffix, then restart the server. Existing
 4. Reload the Ghost draft after the write so its editor loads the new server revision.
 5. To replace an item, approve its replacement, select **In draft**, then **Swap** on the original.
 
-Each opportunity becomes a dedicated Ghost Lexical HTML card containing `<!-- opp:recordId -->` markers. The server preserves all other Lexical nodes, fetches the latest draft before writing, sends `updated_at`, and on a 409 conflict re-fetches and recomputes the change once. It refuses to update published or scheduled posts, and refuses a swap if the original card cannot be located safely.
+Each opportunity is written as **ordinary Lexical text** — an `h3` heading with the title, a paragraph of summary, and a paragraph carrying the deadline and link. No HTML card is used, so editors can retype any of it directly in Ghost. Because nothing is emitted as markup, record values need no HTML escaping; they travel as plain text node content and can never be parsed as tags.
+
+Draft membership is read back from the document itself: an opportunity is present when its **title** appears as an `h3` under the `Opportunity` heading. That makes the Ghost document the single source of truth, with no server-side mirror to drift — but it also means renaming a heading in Ghost, or renaming the record in Airtable, breaks the link between them. A swap then refuses rather than guessing. A block runs from its heading to the next heading, so paragraphs an editor adds inside one are carried along.
+
+The server preserves all other Lexical nodes, fetches the latest draft before writing, sends `updated_at`, and on a 409 conflict re-fetches and recomputes the change once. It refuses to update published or scheduled posts, and refuses a swap if the original cannot be uniquely located.
 
 > Existing cards are **not** automatically rewritten when Airtable content or approval status changes later.
 
@@ -261,7 +265,7 @@ All `/api` routes except the local demo bootstrap require `Authorization: Bearer
 | GET | `/api/session` | Editor identity, mode, Ghost availability, approval destination |
 | GET | `/api/opportunities` | Normalized records and revisions |
 | PATCH | `/api/opportunities/:id` | `{ "fields": { "status": "approved" }, "revision": "..." }` |
-| GET | `/api/drafts` | Up to 100 unpublished drafts and their opportunity IDs |
+| GET | `/api/drafts` | Up to 100 unpublished drafts and the opportunity titles each contains |
 | POST | `/api/drafts/:id/add` | `{ "recordId": "rec..." }` |
 | POST | `/api/drafts/:id/swap` | `{ "removeId": "rec...", "recordId": "rec..." }` |
 | POST | `/api/commands/preview` | `{ "text": "approve Acme" }`; never writes |
@@ -368,4 +372,3 @@ output/      Demo video, captions, voiceover, poster,
 - [Airtable personal access tokens](https://support.airtable.com/articles/9934989703-creating-personal-access-tokens)
 - [Ghost Lexical posts](https://docs.ghost.org/admin-api/posts/overview)
 - [Ghost collision-safe post updates](https://docs.ghost.org/admin-api/posts/updating-a-post)
-

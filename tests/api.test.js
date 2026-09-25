@@ -34,12 +34,12 @@ test('approve, edit, add, swap, and activity round-trip through the real HTTP AP
   assert.equal(approved.status, 200);
   assert.equal(approved.data.record.status, 'approved');
   const added = await f.request('/drafts/demoDraft/add', 'POST', { recordId: a.id });
-  assert.deepEqual(added.data.draft.recordIds, [a.id]);
+  assert.deepEqual(added.data.draft.opportunityTitles, [a.title]);
   const blocked = await f.request('/drafts/demoDraft/swap', 'POST', { recordId: b.id, removeId: a.id });
   assert.equal(blocked.status, 409);
   await f.request(`/opportunities/${b.id}`, 'PATCH', { fields: { status: 'approved', title: 'A revised Globex title' }, revision: b.revision });
   const swapped = await f.request('/drafts/demoDraft/swap', 'POST', { recordId: b.id, removeId: a.id });
-  assert.deepEqual(swapped.data.draft.recordIds, [b.id]);
+  assert.deepEqual(swapped.data.draft.opportunityTitles, ['A revised Globex title']);
   assert.ok((await f.request('/activity')).data.activity.length >= 4);
   assert.equal((await f.request('/opportunities')).data.records[1].title, 'A revised Globex title');
 });
