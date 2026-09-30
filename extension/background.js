@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       const { editorToken, tokenServer } = await chrome.storage.session.get(['editorToken', 'tokenServer']);
       if (!editorToken || tokenServer !== serverUrl) throw new Error('Connect your editor account in Settings. Your session ends when the browser closes.');
       const { method = 'GET', path, body, requestId } = message;
-      const permitted = (method === 'GET' && ['/session', '/opportunities', '/drafts', '/activity'].includes(path)) || (method === 'PATCH' && /^\/opportunities\/[\w-]+$/.test(path)) || (method === 'POST' && (/^\/drafts\/[\w-]+\/(add|swap)$/.test(path) || path === '/commands/preview'));
+      const permitted = (method === 'GET' && (['/session', '/opportunities', '/drafts', '/activity'].includes(path) || /^\/relevance(\?|$)/.test(path))) || (method === 'PATCH' && /^\/opportunities\/[\w-]+$/.test(path)) || (method === 'POST' && (/^\/drafts\/[\w-]+\/(add|swap)$/.test(path) || path === '/commands/preview'));
       if (!permitted) throw new Error('Unsupported action.');
       const response = await fetch(`${serverUrl}/api${path}`, { method, headers: { Authorization: `Bearer ${editorToken}`, 'Content-Type': 'application/json', ...(requestId ? { 'Idempotency-Key': requestId } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(25000), redirect: 'error' });
       const result = await response.json();

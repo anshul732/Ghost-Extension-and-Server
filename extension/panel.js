@@ -1,8 +1,11 @@
 import { latestReview, statusLabel } from './review.js';
 import { api, message } from './bridge.js';
 const $ = selector => document.querySelector(selector);
-const state = { records: [], drafts: [], activity: [], filter: 'pending', search: '', draftId: '', busy: false, connected: false, approvalPostId: null, editId: null, editRevision: null, swapId: null, confirm: null };
+const state = { records: [], drafts: [], activity: [], scores: {}, excluded: [], filter: 'pending', search: '', draftId: '', busy: false, connected: false, approvalPostId: null, editId: null, editRevision: null, swapId: null, confirm: null };
 const el = (tag, cls, text) => { const node = document.createElement(tag); if (cls) node.className = cls; if (text !== undefined) node.textContent = text; return node; };
+const hasScores = () => Object.keys(state.scores).length > 0;
+const scoreOf = r => state.scores[r.id]?.score ?? -1;
+const rankByScore = list => hasScores() ? [...list].sort((a, b) => (scoreOf(b) - scoreOf(a)) || (b.createdAt || '').localeCompare(a.createdAt || '')) : list;
 const selectedDraft = () => state.drafts.find(d => d.id === state.draftId);
 const inDraft = id => selectedDraft()?.recordIds.includes(id) || false;
 const formatDate = date => { const d = new Date(date + 'T12:00:00'); return Number.isNaN(d.valueOf()) ? 'No deadline' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
@@ -18,6 +21,19 @@ async function load(quiet = false) {
   $('#draft-hint').textContent = session.approvalPostId ? 'Approve adds to your configured Ghost post automatically. Save open Ghost edits first, then reload the post.' : !session.ghost ? 'Connect Ghost on your server to start curating a draft.' : 'Save open Ghost edits before adding or swapping. Reload the draft afterward.';
   if (!quiet) notify('');
   render();
+  loadRelevance();
+}
+// Suggestion scoring (urgency + reach + funder) is optional and must never block or
+// break the panel. It runs after the main render and re-renders when results arrive.
+// Excluded opportunities (e.g. blocked-country funders) are hidden from every view.
+async function loadRelevance() {
+  if (!state.connected) return;
+  try {
+    const { scores, excluded } = await api('/relevance');
+    state.scores = scores || {};
+    state.excluded = excluded || [];
+    render();
+  } catch { /* scoring unavailable — keep the date-ordered fallback */ }
 }
 function markOffline(error) { state.connected = false; $('#connection').textContent = 'CONNECTION NEEDS ATTENTION'; $('#live-dot').classList.remove('online'); notify(error.message, true); }
 async function run(task, errorTarget) {
@@ -44,6 +60,8 @@ function card(record) {
   const node = el('article', 'card');
   const top = el('div', 'card-top'); top.append(el('span', 'org-avatar', (record.organization || record.title).charAt(0)), el('span', 'organization', record.organization || 'Independent opportunity'), el('span', 'category', record.category || 'Opportunity'));
   node.append(top, el('h2', '', record.title || 'Untitled opportunity'), el('p', 'card-description', record.summary || 'Open the details to add a description.'));
+  const rel = state.scores[record.id];
+  if (rel) node.append(el('p', 'relevance-reason', `★ ${rel.score}${rel.reason ? ` · ${rel.reason}` : ''}`));
   const meta = el('div', 'card-meta'); meta.append(el('span', 'deadline', record.deadline ? `◷  Closes ${formatDate(record.deadline)}` : '◷  Open deadline'));
   meta.append(el('span', `status ${record.status}`, statusLabel(record.status))); if (inDraft(record.id)) meta.append(el('span', 'status in-draft', 'In draft'));
   if (record.url) { try { const url = new URL(record.url); if (['http:', 'https:'].includes(url.protocol)) { const link = el('a', 'source-link', '↗'); link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.setAttribute('aria-label', `Open source for ${record.title}`); meta.append(link); } } catch {} }
@@ -60,16 +78,17 @@ function card(record) {
   node.append(meta, actions); return node;
 }
 function render() {
-  $('#total').textContent = state.records.length;
+  const visible = state.excluded.length ? state.records.filter(r => !state.excluded.includes(r.id)) : state.records;
+  $('#total').textContent = visible.length;
   const select = $('#draft'); select.replaceChildren();
   if (!state.drafts.length) { const o = el('option', '', 'No connected drafts'); o.value = ''; select.append(o); }
   state.drafts.forEach(d => { const o = el('option', '', d.title); o.value = d.id; select.append(o); }); select.value = state.draftId;
   $('#draft-count').textContent = `${selectedDraft()?.recordIds.length || 0} selected`;
   const matches = (r, f) => f === 'all' || (f === 'in-draft' ? inDraft(r.id) : r.status === f);
-  document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b.dataset.filter === state.filter); b.querySelector('span').textContent = (b.dataset.filter === 'pending' ? latestReview(state.records) : state.records.filter(r => matches(r, b.dataset.filter))).length; });
-  const pool = state.filter === 'pending' ? latestReview(state.records) : state.records;
+  document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b.dataset.filter === state.filter); b.querySelector('span').textContent = (b.dataset.filter === 'pending' ? latestReview(visible, state.scores) : visible.filter(r => matches(r, b.dataset.filter))).length; });
+  const pool = state.filter === 'pending' ? latestReview(visible, state.scores) : rankByScore(visible);
   const records = pool.filter(r => matches(r, state.filter) && `${r.title} ${r.organization} ${r.summary} ${r.category}`.toLowerCase().includes(state.search));
-  $('#list-label').textContent = ({ pending: 'LATEST 8 · AWAITING REVIEW', approved: 'READY FOR YOUR READERS', all: 'THE FULL COLLECTION', 'in-draft': 'YOUR EDITORIAL SELECTION' })[state.filter];
+  $('#list-label').textContent = state.filter === 'pending' && hasScores() ? 'TOP 8 · SUGGESTED' : ({ pending: 'LATEST 8 · AWAITING REVIEW', approved: 'READY FOR YOUR READERS', all: 'THE FULL COLLECTION', 'in-draft': 'YOUR EDITORIAL SELECTION' })[state.filter];
   $('#list-count').textContent = `${records.length} ${records.length === 1 ? 'opportunity' : 'opportunities'}`;
   $('#records').replaceChildren(...(records.length ? records.map(card) : [el('div', 'empty', state.search ? 'No matches yet. Try another name or keyword.' : state.filter === 'pending' ? 'All caught up. Your next good thing will appear here.' : state.filter === 'in-draft' ? 'Your draft is a blank canvas. Add an approved opportunity to get started.' : 'Nothing here yet. Review the pending opportunities to get started.')]));
   $('#activity').replaceChildren(...(state.activity.length ? state.activity.map(a => { const row = el('div', 'activity-item'); const info = el('div'); info.append(el('p', '', a.description), el('small', '', `${a.editor} · ${new Date(a.at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`)); row.append(el('span', 'activity-dot', '✓'), info); return row; }) : [el('div', 'empty', 'A fresh start. Your team’s changes will show up here.')]));
@@ -80,7 +99,7 @@ function openEdit(record) {
   $('#edit-error').textContent = ''; $('#detail-dialog').showModal();
 }
 function openSwap(record) {
-  const candidates = state.records.filter(r => r.status === 'approved' && !inDraft(r.id));
+  const candidates = rankByScore(state.records.filter(r => r.status === 'approved' && !inDraft(r.id) && !state.excluded.includes(r.id)));
   if (!candidates.length) return notify('Approve another opportunity first, then swap it into this draft.', true);
   state.swapId = record.id; $('#swap-description').textContent = `Replace “${record.title}” in “${selectedDraft().title}”.`;
   $('#replacement').replaceChildren(...candidates.map(r => { const o = el('option', '', r.title); o.value = r.id; return o; }));
