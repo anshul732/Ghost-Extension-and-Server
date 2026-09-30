@@ -22,46 +22,68 @@ export function validatePatch(input) {
   if (out.deadline) { const date = new Date(out.deadline); assert(/^\d{4}-\d{2}-\d{2}$/.test(out.deadline) && !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === out.deadline, 400, 'Use a valid deadline date.'); }
   return out;
 }
-const escape = value => String(value || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-export function opportunityHtml(record) {
-  let url = ''; try { const parsed = new URL(record.url); if (['https:', 'http:'].includes(parsed.protocol)) url = parsed.href; } catch {}
+// Opportunities are written as ordinary Lexical text, never as HTML cards, so
+// editors can retype them in Ghost. Nothing here emits markup, so record values
+// need no HTML escaping: they travel as plain text node content.
+export const SECTION_HEADING = 'Opportunity';
+const text = value => ({ type: 'extended-text', version: 1, text: String(value ?? ''), format: 0, detail: 0, mode: 'normal', style: '' });
+const paragraph = children => ({ type: 'paragraph', version: 1, format: '', indent: 0, direction: 'ltr', children });
+const heading = (tag, value) => ({ type: 'heading', version: 1, tag, format: '', indent: 0, direction: 'ltr', children: [text(value)] });
+const link = url => ({ type: 'link', version: 1, url, rel: null, target: null, title: null, format: '', indent: 0, direction: 'ltr', children: [text(url)] });
+const headingText = node => node?.type === 'heading' ? (node.children || []).map(c => c.text || '').join('') : null;
+const isHeading = node => node?.type === 'heading';
+export function opportunitySummary(record) {
   const clean = String(record.summary || '').replace(/\s+/g, ' ').trim();
   const first = clean.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim() || clean;
-  const summary = first.length > 180 ? first.slice(0, 177).replace(/\s+\S*$/, '') + '…' : first;
-  return `<!-- opp:${safeId(record.id)} --><h3>${escape(record.title)}</h3><p>${escape(summary)}</p><p>Deadline: ${escape(record.deadline || 'Not specified')}${url ? ` · <a href="${escape(url)}">${escape(url)}</a>` : ''}</p><!-- /opp:${record.id} -->`;
-
+  return first.length > 180 ? first.slice(0, 177).replace(/\s+\S*$/, '') + '…' : first;
 }
-export function draftRecordIds(post) {
+export function opportunityNodes(record) {
+  let url = ''; try { const parsed = new URL(record.url); if (['https:', 'http:'].includes(parsed.protocol)) url = parsed.href; } catch {}
+  const meta = [text(`Deadline: ${record.deadline || 'Not specified'}`)];
+  if (url) meta.push(text(' · '), link(url));
+  return [heading('h3', record.title), paragraph([text(opportunitySummary(record))]), paragraph(meta)];
+}
+// Draft membership is read back from the document itself: each opportunity is the
+// h3 whose text is its title. Titles, not record IDs, are the link between the two.
+export function draftOpportunityTitles(post) {
   let doc; try { doc = JSON.parse(post.lexical); } catch { return []; }
-  return (doc.root?.children || []).flatMap(node => node.type === 'html' ? [...(node.html || '').matchAll(/<!-- opp:([a-zA-Z0-9_-]+) -->/g)].map(m => m[1]) : []);
+  const children = doc.root?.children || [];
+  const start = children.findIndex(n => n.tag === 'h2' && headingText(n) === SECTION_HEADING);
+  if (start < 0) return [];
+  return children.slice(start + 1).filter(n => n.tag === 'h3').map(headingText).filter(Boolean);
 }
-// Preserve the entire Lexical document. Only our dedicated HTML cards are replaced.
-export function patchDraft(post, record, removeId, options = {}) {
+// Preserve the entire Lexical document. Only our own opportunity blocks are replaced.
+export function patchDraft(post, record, remove, options = {}) {
   assert(post.status === 'draft' || (post.status === 'published' && options.approvalPostId === post.id), 409, 'Only unpublished drafts can be changed.');
   let doc; try { doc = JSON.parse(post.lexical); } catch { throw new HttpError(409, 'This draft has no valid Lexical document. Open and save it in Ghost first.'); }
   assert(Array.isArray(doc.root?.children), 409, 'Unsupported draft document.');
   const children = doc.root.children;
-  const existing = draftRecordIds(post);
-  if (!removeId && existing.includes(record.id)) return null;
-  const card = { type: 'html', version: 1, html: opportunityHtml(record) };
-  if (removeId) {
-    safeId(removeId);
-    assert(removeId !== record.id, 400, 'Choose a different replacement.');
+  const existing = draftOpportunityTitles(post);
+  assert(record.title, 409, 'This opportunity needs a title before it can be added to a draft.');
+  if (!remove && existing.includes(record.title)) return null;
+  const nodes = opportunityNodes(record);
+  // The end of a block is the next heading, so editors may add paragraphs inside one.
+  const blockEnd = start => { let end = start + 1; while (end < children.length && !isHeading(children[end])) end++; return end; };
+  if (remove) {
+    assert(remove.title, 400, 'The opportunity being replaced has no title to match.');
+    assert(remove.title !== record.title, 400, 'Choose a different replacement.');
     // A retry after a successful swap is a no-op, even if the first response was lost.
-    if (!existing.includes(removeId) && existing.includes(record.id)) return null;
-    assert(!existing.includes(record.id), 409, 'Replacement is already in this draft.');
-    const indices = children.map((n, i) => n.type === 'html' && n.html?.includes(`<!-- opp:${removeId} -->`) ? i : -1).filter(i => i >= 0);
-    assert(indices.length === 1, 409, 'Could not uniquely locate the original opportunity card.');
-    const original = children[indices[0]].html;
-    assert(original.startsWith(`<!-- opp:${removeId} -->`) && original.endsWith(`<!-- /opp:${removeId} -->`) && [...original.matchAll(/<!-- opp:/g)].length === 1, 409, 'The opportunity card was restructured. Review it in Ghost before swapping.');
-    children[indices[0]] = { ...children[indices[0]], html: card.html };
+    if (!existing.includes(remove.title) && existing.includes(record.title)) return null;
+    assert(!existing.includes(record.title), 409, 'Replacement is already in this draft.');
+    const indices = children.map((n, i) => n.tag === 'h3' && headingText(n) === remove.title ? i : -1).filter(i => i >= 0);
+    assert(indices.length === 1, 409, 'Could not uniquely locate the original opportunity.');
+    children.splice(indices[0], blockEnd(indices[0]) - indices[0], ...nodes);
   } else {
-    const heading = '<!-- opportunities:heading --><h2>Opportunity</h2><hr><!-- /opportunities:heading -->';
-    const headers = children.filter(n => n.type === 'html' && n.html === heading);
-    assert(headers.length <= 1, 409, 'Duplicate Opportunity headings need review.');
-    if (!headers.length) children.push({type: 'html', version: 1, html: heading});
-    const positions = children.map((n,i) => n.type === 'html' && (n.html === heading || n.html?.startsWith('<!-- opp:')) ? i : -1);
-    children.splice(Math.max(...positions) + 1, 0, card);
+    const headings = children.filter(n => n.tag === 'h2' && headingText(n) === SECTION_HEADING);
+    assert(headings.length <= 1, 409, 'Duplicate Opportunity headings need review.');
+    let insert;
+    if (!headings.length) { children.push(heading('h2', SECTION_HEADING), { type: 'horizontalrule', version: 1 }); insert = children.length; }
+    else {
+      const start = children.indexOf(headings[0]);
+      insert = start + 1;
+      for (let i = insert; i < children.length; i++) if (children[i].tag === 'h3') insert = blockEnd(i);
+    }
+    children.splice(insert, 0, ...nodes);
   }
   return JSON.stringify(doc);
 }

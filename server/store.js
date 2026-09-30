@@ -32,7 +32,7 @@ export function demoAdapters(store) {
     ghost: {
       async list() { return structuredClone(store.state.drafts.filter(d => d.status === 'draft')); },
       async get(id) { return structuredClone(find(store.state.drafts, id)); },
-      async putOpportunity(id, record, removeId) { const d = find(store.state.drafts, id); const lexical = patchDraft(d, record, removeId); if (lexical) { d.lexical = lexical; d.updated_at = new Date().toISOString(); await store.save(); } return structuredClone(d); }
+      async putOpportunity(id, record, remove) { const d = find(store.state.drafts, id); const lexical = patchDraft(d, record, remove); if (lexical) { d.lexical = lexical; d.updated_at = new Date().toISOString(); await store.save(); } return structuredClone(d); }
     }
   };
 }

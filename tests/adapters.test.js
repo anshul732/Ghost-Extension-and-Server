@@ -48,7 +48,7 @@ test('approval destination uses the Pages API and pages payload for a Ghost page
  const {drafts:[page],records:[record]}=seed();let writes=0;
  const api=ghostAdapter({url:'https://ghost.example',key:'id:'+'b'.repeat(64)},async(url,init)=>{
  assert.ok(url.includes('/admin/pages/'));assert.ok(!url.includes('/admin/posts/'));
- if(init.method==='PUT'){writes++;const body=JSON.parse(init.body);assert.deepEqual(Object.keys(body),['pages']);assert.ok(body.pages[0].lexical.includes('<h2>Opportunity</h2><hr>'));return response({pages:[{...page,...body.pages[0]}]});}
+ if(init.method==='PUT'){writes++;const body=JSON.parse(init.body);assert.deepEqual(Object.keys(body),['pages']);const kids=JSON.parse(body.pages[0].lexical).root.children;assert.equal(kids.filter(n=>n.type==='html').length,0);assert.ok(kids.some(n=>n.tag==='h2'&&(n.children||[]).map(c=>c.text).join('')==='Opportunity'));assert.ok(kids.some(n=>n.type==='horizontalrule'));return response({pages:[{...page,...body.pages[0]}]});}
  return response({pages:[page]});
  });
  await api.putOpportunity(page.id,record,undefined,{approvalPostId:page.id,resource:'pages'});assert.equal(writes,1);

@@ -1,1 +1,33 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connect Opportunities</title><link rel="stylesheet" href="panel.css"><link rel="stylesheet" href="options.css"><script type="module" src="options.js"></script></head><body><main class="setup"><div class="brand"><span class="brand-icon">o<span>↗</span></span><span>opportunities<span class="brand-sub">THE EDITOR’S COMPANION</span></span></div><span class="eyebrow setup-eyebrow">A HOME FOR YOUR EDITORIAL FLOW</span><h1>Let’s connect<br>the good things.</h1><p class="setup-intro">One connection to your workspace. Airtable opportunities and Ghost drafts, together where you work.</p><form id="setup-form"><label>Sync server URL<input id="server-url" type="url" required placeholder="https://api.example.com"></label><small>The address of your Opportunities server. Use http://localhost:8787 for the demo.</small><label>Ghost Admin URL<input id="ghost-url" type="url" required placeholder="https://your-publication.com/ghost/"></label><small>The panel appears only on your selected Ghost site.</small><label>Editor access token<input id="editor-token" type="password" autocomplete="off" placeholder="Paste the token from your server administrator"></label><small>This is your editor token, not an Airtable or Ghost API key. The token stays in this browser session; reconnect after closing the browser.</small><div id="setup-status" class="notice" role="status" hidden></div><button id="connect" class="primary">Save & test connection →</button></form><div class="demo-note"><strong>Taking a first look?</strong><p>Start the local server with <code>npm start</code>, then open the <a href="http://localhost:8787" target="_blank" rel="noopener">demo workspace ↗</a> and click “Copy demo token”. Paste it above and keep the local addresses.</p></div><button id="disconnect" class="subtle">Disconnect editor session</button></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Opportunities — Connection settings</title>
+  <link rel="stylesheet" href="panel.css">
+  <link rel="stylesheet" href="options.css">
+  <script type="module" src="options.js"></script>
+</head>
+<body>
+  <main class="setup">
+    <div class="brand"><img class="brand-logo" src="assets/ijnet-logo.png" alt="International Journalists’ Network"></div>
+    <span class="eyebrow setup-eyebrow">CONNECTION SETTINGS</span>
+    <h1>Connect your workspace</h1>
+    <p class="setup-intro">Connect Airtable and Ghost through your editorial server.</p>
+    <form id="setup-form">
+      <label for="server-url">Sync server URL</label>
+      <input id="server-url" type="url" required placeholder="https://api.example.com" aria-describedby="server-help">
+      <small id="server-help">Use the server address provided by your administrator.</small>
+      <label for="ghost-url">Ghost Admin URL</label>
+      <input id="ghost-url" type="url" required placeholder="https://your-publication.com/ghost/" aria-describedby="ghost-help">
+      <small id="ghost-help">The panel appears on this Ghost site.</small>
+      <label for="editor-token">Editor access token</label>
+      <input id="editor-token" type="password" autocomplete="off" placeholder="Enter your editor token" aria-describedby="token-help">
+      <small id="token-help">Use your editor token, not an Airtable or Ghost API key. Reconnect after closing your browser.</small>
+      <div id="setup-status" class="notice" role="status" hidden></div>
+      <button id="connect" class="primary">Save & test connection</button>
+    </form>
+    <button id="disconnect" class="subtle">Disconnect session</button>
+  </main>
+</body>
+</html>
