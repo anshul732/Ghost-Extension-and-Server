@@ -81,6 +81,7 @@ Note the summary ending in `…` — that is the 180-character first-sentence ca
 - [Connect Ghost drafts](#connect-ghost-drafts)
 - [Editor commands](#editor-commands)
 - [Automatic approval destination](#automatic-approval-destination)
+- [Relevance scoring (LLM)](#relevance-scoring-llm)
 - [API contract](#api-contract)
 - [Validation and limits](#validation-and-limits)
 - [Host the server](#host-the-server)
@@ -309,7 +310,7 @@ The panel footer provides a small, deterministic command parser:
 
 Commands resolve an unambiguous title, organization, or record ID, and always show a preview for confirmation before anything changes.
 
-> **This version does not include an LLM or a general natural-language agent.** These are fixed verb-plus-target commands, not conversational input. Use the form for content edits and the swap control for draft replacement.
+> **The command parser itself uses no LLM or natural-language agent** — these are fixed verb-plus-target commands, not conversational input. (Relevance scoring is a separate, optional LLM feature; see [Relevance scoring (LLM)](#relevance-scoring-llm).) Use the form for content edits and the swap control for draft replacement.
 
 ---
 
@@ -332,6 +333,32 @@ The server appends one Opportunity heading and divider, followed by each title, 
 
 ---
 
+## Relevance scoring (LLM)
+
+An optional LLM pass ranks the review queue so the most feature-worthy opportunities surface first. It is powered by Anthropic's Claude and is **off until you set `ANTHROPIC_API_KEY`** — with no key the panel simply falls back to newest-first ordering and shows every opportunity.
+
+```dotenv
+ANTHROPIC_API_KEY=sk-ant-...
+LLM_MODEL=claude-sonnet-5                  # optional; this is the default
+ANTHROPIC_WORKSPACE_ID=your-workspace-id   # only for organization-scoped keys
+```
+
+**What it scores.** For every `pending` or `approved` record the model returns a **0–100 feature-priority score**, a **one-line reason** (≤14 words, shown on each card as `★ 72 · Deadline soon, global reach, reputable funder`), and the **funder's country**. Scoring weighs three things and deliberately ignores topic fit:
+
+- **Urgency** — sooner deadlines rank higher; an already-passed deadline scores near zero and is never featured.
+- **Geographic reach** — opportunities open globally or worldwide rank above regional ones, which rank above single-country.
+- **Funder** — reputable, legitimate sponsoring organizations are preferred.
+
+The panel sorts highest-score-first and shows the top eight awaiting review. The score and reason render directly on each card.
+
+**Blocked-country exclusion.** Opportunities funded from configured blocked countries (currently **Russia** and **China**) are hidden from every view. This decision is enforced **in server code**, not left to the model: the Airtable `funderCountry` field is authoritative, and the model's inferred country is only a fallback when the field is empty. Add the optional `region` and `funderCountry` columns through `AIRTABLE_FIELDS` (see [`.env.example`](.env.example)) to make reach and exclusion authoritative rather than inferred.
+
+**Cost and caching.** Scores are cached per record for the day — keyed by record, revision, and date — so the model runs at most **once per day per opportunity**, and again only when a record is edited or the date rolls over. The 60-second panel refresh serves cached scores; it does **not** call the model every minute. Each batch sends up to 200 records with summaries trimmed to 600 characters, on a 30-second timeout.
+
+**Fail-safe.** Scoring never blocks or breaks the panel. Any failure — missing key, unreachable API, timeout, or malformed response — degrades to an empty result and the date-ordered fallback, so the review workflow always keeps working.
+
+---
+
 ## API contract
 
 All `/api` routes except the local demo bootstrap require `Authorization: Bearer <editor token>`. Send JSON for POST and PATCH. Mutating record and draft requests require a unique `Idempotency-Key`.
@@ -346,6 +373,7 @@ All `/api` routes except the local demo bootstrap require `Authorization: Bearer
 | POST | `/api/drafts/:id/add` | `{ "recordId": "rec..." }` |
 | POST | `/api/drafts/:id/swap` | `{ "removeId": "rec...", "recordId": "rec..." }` |
 | POST | `/api/commands/preview` | `{ "text": "approve Acme" }`; never writes |
+| GET | `/api/relevance` | LLM feature-priority scores and blocked-funder exclusions; empty `{ "scores": {}, "excluded": [] }` when no `ANTHROPIC_API_KEY` is set |
 | GET | `/api/activity` | 50 most recent editor actions through this server |
 | POST | `/api/demo-session` | **Demo mode only.** Loopback-only token bootstrap |
 | GET | `/api/demo-draft` | **Demo mode only.** Simulated draft for the local preview |
@@ -404,7 +432,7 @@ Serve the server behind HTTPS and restrict the origin and network as appropriate
 
 - This is an initial internal-team release, not a production deployment. Live adapters have contract tests; real Airtable and Ghost integration still needs a staging smoke test against your schema and Ghost version.
 - Airtable offers no atomic compare-and-swap here, so concurrent direct Airtable edits can still race. The server serializes its own mutations but cannot lock external editors.
-- No Ghost publish webhook, email-delivery reconciliation, notification service, distributed queue, SSO, roles, or conversational AI is included. Publishing remains in Ghost.
+- No Ghost publish webhook, email-delivery reconciliation, notification service, distributed queue, SSO, or roles is included. The optional LLM (see [Relevance scoring](#relevance-scoring-llm)) only ranks and filters the queue; there is no conversational or agentic AI, and publishing remains in Ghost.
 - Ghost's saved content is protected by `updated_at`; unsaved text in an open Ghost editor is invisible to the server. Save before syncing, reload afterwards.
 - Supports Chrome and Edge, Manifest V3. Firefox packaging and enterprise distribution are not configured. Ghost UI changes can affect DOM injection — verify mounting and navigation on staging before upgrading Ghost.
 - The panel is deliberately an overlay with a collapse handle. It does not modify Ghost's native editor layout or insert its interface into published content.
