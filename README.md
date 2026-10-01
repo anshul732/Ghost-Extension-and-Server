@@ -316,16 +316,34 @@ Commands resolve an unambiguous title, organization, or record ID, and always sh
 
 ## Automatic approval destination
 
-`GHOST_APPROVAL_POST_ID` routes approvals made through the extension to one configured Ghost post or page:
+Turn on auto-add and **Approve** also adds the opportunity to the editor's own working draft. Nobody has to configure a post ID:
+
+```dotenv
+GHOST_AUTO_ADD_ON_APPROVE=true
+```
+
+The panel works out the working draft for each editor:
+
+1. **The post open in the Ghost editor.** The content script reads the ID from the `#/editor/post/<id>` URL, and the panel selects that post in **Your working draft** when it is a draft.
+2. **The post chosen in the dropdown**, when no draft is open in the editor.
+3. **The optional fallback post** (`GHOST_APPROVAL_POST_ID`, below), when nothing is selected. With no fallback, the panel asks the editor to choose a draft before approving.
+
+A post the panel names must be an unpublished **draft post**. The server rejects anything else with `409`.
+
+### Optional fallback post
+
+`GHOST_APPROVAL_POST_ID` sets one fixed post or page used when no working draft is selected. Setting it also turns on auto-add, so existing setups keep working unchanged:
 
 ```dotenv
 GHOST_APPROVAL_POST_ID=your-ghost-post-or-page-id
 GHOST_APPROVAL_RESOURCE=pages
 ```
 
-`GHOST_APPROVAL_RESOURCE` accepts `posts` (default, for blog posts) or `pages` (Ghost Pages API).
+`GHOST_APPROVAL_RESOURCE` accepts `posts` (default, for blog posts) or `pages` (Ghost Pages API). It applies only to this fallback.
 
-That explicitly configured destination **may be published**: approval then updates the live page without sending a newsletter email. Every other route keeps draft-only protection.
+This explicitly configured fallback **may be published**: approval then updates the live page without sending a newsletter email. Every other route keeps draft-only protection.
+
+With neither variable set, Approve only updates Airtable, and editors add approved opportunities with **+ Add to draft**. When auto-add is on, that button still appears for opportunities approved earlier that are not yet in the selected draft.
 
 Ghost is updated **before** Airtable becomes Approved. A failed Airtable write reports partial completion, and re-approving safely reconciles the already-marked card. Existing Airtable approvals, and approvals made directly in Airtable, are not backfilled or polled.
 

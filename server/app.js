@@ -38,6 +38,9 @@ export async function createApp(config = {}) {
   const adapters = demo ? demoAdapters(store) : { airtable: airtableAdapter(config.airtable), ghost: config.ghost?.url && config.ghost?.key ? ghostAdapter(config.ghost) : null };
   const { airtable, ghost } = config.adapters || adapters;
   const relevance = config.relevance || (config.anthropicKey ? relevanceAdapter({ apiKey: config.anthropicKey, model: config.llmModel, workspaceId: config.anthropicWorkspaceId }) : null);
+  // Approve also adds to Ghost when turned on, or when a fixed fallback post is configured.
+  // The panel names the editor's own working draft; the fixed post is only the fallback.
+  const autoAdd = !!(config.autoAddOnApprove || config.approvalPostId);
   const relevanceCache = new Map();
   let tail = Promise.resolve();
   const serialize = fn => { const result = tail.then(fn); tail = result.catch(() => {}); return result; };
@@ -67,7 +70,7 @@ export async function createApp(config = {}) {
       const token = req.headers.authorization?.replace(/^Bearer /, '');
       const editor = Object.keys(tokens).find(name => sameToken(tokens[name], token));
       assert(editor, 401, 'Connect with a valid editor access token in extension settings.');
-      if (url.pathname === '/api/session' && req.method === 'GET') return send(200, { editor, mode, ghost: !!ghost, approvalPostId: config.approvalPostId || null, approvalResource: config.approvalResource || 'posts' });
+      if (url.pathname === '/api/session' && req.method === 'GET') return send(200, { editor, mode, ghost: !!ghost, autoAdd, approvalPostId: config.approvalPostId || null, approvalResource: config.approvalResource || 'posts' });
       if (url.pathname === '/api/opportunities' && req.method === 'GET') return send(200, { records: await airtable.list() });
       if (url.pathname === '/api/drafts' && req.method === 'GET') return send(200, { drafts: ghost ? (await ghost.list()).map(summarizeDraft) : [] });
       if (url.pathname === '/api/activity' && req.method === 'GET') return send(200, { activity: store.state.activity.slice(0, 50) });
@@ -118,7 +121,8 @@ export async function createApp(config = {}) {
         const prior = store.state.operations[key];
         if (prior) {
           assert(prior.fingerprint === fingerprint, 409, 'This request ID was used for a different action.');
-          assert(prior.result || (prior.approvalPostId && prior.approvalPostId === config.approvalPostId), 409, 'The earlier request may have reached the service. Refresh and inspect the record or draft before submitting a new action.');
+          // Ghost writes are idempotent by title, so an unfinished approval may be retried.
+          assert(prior.result || (prior.approvalPostId && autoAdd), 409, 'The earlier request may have reached the service. Refresh and inspect the record or draft before submitting a new action.');
           if (prior.result) return prior.result;
         }
         let execute, description, approvalPostId;
@@ -127,12 +131,19 @@ export async function createApp(config = {}) {
           assert(typeof input.revision === 'string', 400, 'A record revision is required.');
           // Preflight check, plus the adapter re-checks immediately before writing.
           assert((await airtable.get(id)).revision === input.revision, 409, 'This opportunity changed. Refresh and review the latest version.');
-          approvalPostId = patch.status === 'approved' ? config.approvalPostId : undefined;
-          if (approvalPostId) assert(ghost, 503, 'Ghost must be connected before approving.');
+          if (patch.status === 'approved' && autoAdd) {
+            approvalPostId = input.draftId ? safeId(input.draftId) : config.approvalPostId;
+            assert(approvalPostId, 400, 'Open your draft in Ghost or choose it in the panel before approving.');
+            assert(ghost, 503, 'Ghost must be connected before approving.');
+            assert(!prior || prior.approvalPostId === approvalPostId, 409, 'The approval destination changed. Refresh before retrying.');
+          }
+          // Only the server-configured post may be published (or a page); a draft chosen
+          // in the panel is always a post and keeps patchDraft's draft-only protection.
+          const fixed = approvalPostId && approvalPostId === config.approvalPostId;
           execute = async () => {
             if (approvalPostId) {
               const current = await airtable.get(id);
-              const post = await ghost.putOpportunity(approvalPostId, {...current, ...patch}, undefined, {approvalPostId, resource: config.approvalResource || 'posts'});
+              const post = await ghost.putOpportunity(approvalPostId, {...current, ...patch}, undefined, {approvalPostId: config.approvalPostId, resource: fixed ? config.approvalResource || 'posts' : 'posts'});
               try { return {record: await airtable.update(id, patch, input.revision), draft: summarizeDraft(post)}; }
               catch { throw new HttpError(409, 'Added to Ghost, but Airtable approval did not finish. Refresh and approve again to reconcile; the opportunity will not be duplicated.'); }
             }

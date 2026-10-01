@@ -14,7 +14,19 @@
   chrome.runtime.onMessage.addListener(message => { if (message.type === 'toggle-panel') toggle(); });
   shadow.append(style, frame, button);
   const mount = () => { if (!host.isConnected && document.body) document.body.append(host); };
+  // Tell the panel which post is open in the Ghost editor (#/editor/post/<id>), so
+  // approvals go to the editor's own working draft without configuring an ID.
+  const panelOrigin = new URL(chrome.runtime.getURL('')).origin;
+  let lastPostId;
+  const sendEditorPost = (force = false) => {
+    const postId = location.hash.match(/^#\/editor\/post\/([a-f0-9]{24})(?:[/?]|$)/)?.[1] || null;
+    if (!force && postId === lastPostId) return;
+    lastPostId = postId;
+    frame.contentWindow?.postMessage({ type: 'ghost-editor', postId }, panelOrigin);
+  };
+  frame.addEventListener('load', () => sendEditorPost(true));
+  window.addEventListener('hashchange', () => sendEditorPost());
   mount();
   // Ghost is a SPA; reattach the same host if a route transition removes it.
-  new MutationObserver(mount).observe(document.documentElement, { childList: true, subtree: true });
+  new MutationObserver(() => { mount(); sendEditorPost(); }).observe(document.documentElement, { childList: true, subtree: true });
 })();

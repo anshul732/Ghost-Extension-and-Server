@@ -1,25 +1,25 @@
 import { latestReview, statusLabel } from './review.js';
 import { api, message } from './bridge.js';
 const $ = selector => document.querySelector(selector);
-const state = { records: [], drafts: [], activity: [], scores: {}, excluded: [], filter: 'pending', search: '', draftId: '', busy: false, connected: false, approvalPostId: null, editId: null, editRevision: null, swapId: null, confirm: null };
+const state = { records: [], drafts: [], activity: [], scores: {}, excluded: [], filter: 'pending', search: '', draftId: '', busy: false, connected: false, ghost: false, autoAdd: false, approvalPostId: null, editorPostId: null, editId: null, editRevision: null, swapId: null, confirm: null };
 const el = (tag, cls, text) => { const node = document.createElement(tag); if (cls) node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 const hasScores = () => Object.keys(state.scores).length > 0;
 const scoreOf = r => state.scores[r.id]?.score ?? -1;
 const rankByScore = list => hasScores() ? [...list].sort((a, b) => (scoreOf(b) - scoreOf(a)) || (b.createdAt || '').localeCompare(a.createdAt || '')) : list;
 const selectedDraft = () => state.drafts.find(d => d.id === state.draftId);
 const draftTitles = () => selectedDraft()?.opportunityTitles || [];
+const isDraft = id => !!id && state.drafts.some(d => d.id === id);
 const inDraft = id => draftTitles().includes(state.records.find(r => r.id === id)?.title);
 const formatDate = date => { const d = new Date(date + 'T12:00:00'); return Number.isNaN(d.valueOf()) ? 'No deadline' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
 function notify(text, error = false) { const n = $('#notice'); n.textContent = text; n.className = `notice${error ? ' error' : ''}`; n.hidden = !text; }
 async function load(quiet = false) {
   const session = await api('/session');
   const [records, drafts, activity] = await Promise.all([api('/opportunities'), api('/drafts'), api('/activity')]);
-  Object.assign(state, { records: records.records, drafts: drafts.drafts, activity: activity.activity, connected: true, approvalPostId: session.approvalPostId });
-  if (!state.drafts.some(d => d.id === state.draftId)) state.draftId = state.drafts[0]?.id || '';
+  Object.assign(state, { records: records.records, drafts: drafts.drafts, activity: activity.activity, connected: true, ghost: session.ghost, autoAdd: !!session.autoAdd && session.ghost, approvalPostId: session.approvalPostId });
+  if (!state.drafts.some(d => d.id === state.draftId)) state.draftId = isDraft(state.editorPostId) ? state.editorPostId : state.autoAdd ? '' : state.drafts[0]?.id || '';
   $('#connection').textContent = session.mode === 'demo' ? 'DEMO WORKSPACE · SAMPLE OPPORTUNITIES' : 'CONNECTED TO AIRTABLE';
   $('#live-dot').classList.add('online');
   $('#sync-time').textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-  $('#draft-hint').textContent = session.approvalPostId ? 'Approve adds to your configured Ghost post automatically. Save open Ghost edits first, then reload the post.' : !session.ghost ? 'Connect Ghost on your server to start curating a draft.' : 'Save open Ghost edits before adding or swapping. Reload the draft afterward.';
   if (!quiet) notify('');
   render();
   loadRelevance();
@@ -51,8 +51,11 @@ async function refreshAfter(messageText) {
 }
 function button(text, cls, action) { const node = el('button', cls, text); node.type = 'button'; node.addEventListener('click', action); return node; }
 async function changeStatus(record, status) {
-  await api(`/opportunities/${record.id}`, 'PATCH', { fields: { status }, revision: record.revision });
-  await refreshAfter(status === 'approved' && state.approvalPostId ? `“${record.title}” approved and added to your Ghost post. Reload Ghost to see it.` : `“${record.title}” marked ${statusLabel(status)}.`);
+  const adds = status === 'approved' && state.autoAdd;
+  if (adds && !state.draftId && !state.approvalPostId) throw new Error('Open your draft in Ghost or choose it under “Your working draft” before approving.');
+  const target = selectedDraft()?.title;
+  await api(`/opportunities/${record.id}`, 'PATCH', { fields: { status }, revision: record.revision, ...(adds && state.draftId ? { draftId: state.draftId } : {}) });
+  await refreshAfter(adds ? `“${record.title}” approved and added to ${target ? `“${target}”` : 'your default Ghost post'}. Reload Ghost to see it.` : `“${record.title}” marked ${statusLabel(status)}.`);
 }
 function confirm(copy, action) {
   state.confirm = action; $('#confirm-copy').textContent = copy; $('#confirm-error').textContent = ''; $('#confirm-dialog').showModal();
@@ -69,7 +72,7 @@ function card(record) {
   const actions = el('div', 'card-actions');
   if (record.status !== 'approved') actions.append(button('✓ Approve', 'primary', () => run(() => changeStatus(record, 'approved'))));
   if (record.status === 'pending') actions.append(button('Reject', 'secondary', () => confirm(`Mark “${record.title}” as Not Approved?`, () => changeStatus(record, 'rejected'))));
-  if (record.status === 'approved' && !inDraft(record.id) && !state.approvalPostId) actions.append(button('+ Add to draft', 'primary', () => {
+  if (record.status === 'approved' && !inDraft(record.id) && (!state.autoAdd || state.draftId)) actions.append(button('+ Add to draft', 'primary', () => {
     if (!state.draftId) return notify('Select a working draft first. If none appear, configure Ghost on the server.', true);
     confirm(`Add “${record.title}” to “${selectedDraft().title}”? Save any open edits in Ghost first.`, async () => { await api(`/drafts/${state.draftId}/add`, 'POST', { recordId: record.id }); await refreshAfter('Opportunity added. Reload the draft in Ghost to see the update.'); });
   }));
@@ -82,9 +85,15 @@ function render() {
   const visible = state.excluded.length ? state.records.filter(r => !state.excluded.includes(r.id)) : state.records;
   $('#total').textContent = visible.length;
   const select = $('#draft'); select.replaceChildren();
-  if (!state.drafts.length) { const o = el('option', '', 'No connected drafts'); o.value = ''; select.append(o); }
+  if (state.autoAdd) { const o = el('option', '', state.approvalPostId ? 'Default post (server setting)' : 'Choose your working draft…'); o.value = ''; select.append(o); }
+  else if (!state.drafts.length) { const o = el('option', '', 'No connected drafts'); o.value = ''; select.append(o); }
   state.drafts.forEach(d => { const o = el('option', '', d.title); o.value = d.id; select.append(o); }); select.value = state.draftId;
   $('#draft-count').textContent = `${draftTitles().length} selected`;
+  $('#draft-hint').textContent = !state.ghost ? 'Connect Ghost on your server to start curating a draft.'
+    : !state.autoAdd ? 'Save open Ghost edits before adding or swapping. Reload the draft afterward.'
+    : state.draftId ? `Approve adds to “${selectedDraft().title}” automatically. Save open Ghost edits first, then reload the post.`
+    : state.approvalPostId ? 'Approve adds to the default post set on the server. Open a draft in Ghost or choose one here to use it instead.'
+    : 'Open your draft in Ghost or choose it here. Approve then adds opportunities to it automatically.';
   const matches = (r, f) => f === 'all' || (f === 'in-draft' ? inDraft(r.id) : r.status === f);
   document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b.dataset.filter === state.filter); b.querySelector('span').textContent = (b.dataset.filter === 'pending' ? latestReview(visible, state.scores) : visible.filter(r => matches(r, b.dataset.filter))).length; });
   const pool = state.filter === 'pending' ? latestReview(visible, state.scores) : rankByScore(visible);
@@ -110,6 +119,14 @@ $('#settings').addEventListener('click', () => message({ type: 'settings:open' }
 $('#refresh').addEventListener('click', () => run(async () => { try { await load(); } catch (error) { markOffline(error); } }));
 $('#search').addEventListener('input', event => { state.search = event.target.value.trim().toLowerCase(); render(); });
 $('#draft').addEventListener('change', event => { state.draftId = event.target.value; render(); });
+// The content script reports the post open in the Ghost editor; follow it when it is a draft.
+window.addEventListener('message', event => {
+  if (event.source !== window.parent || event.data?.type !== 'ghost-editor') return;
+  const postId = event.data.postId;
+  if (postId !== null && !(typeof postId === 'string' && /^[a-f0-9]{24}$/.test(postId))) return;
+  state.editorPostId = postId;
+  if (isDraft(postId) && state.draftId !== postId) { state.draftId = postId; render(); }
+});
 document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { state.filter = b.dataset.filter; render(); }));
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('[data-view]').forEach(tab => tab.classList.toggle('active', tab === b)); $('#opportunities-view').hidden = b.dataset.view !== 'opportunities'; $('#activity-view').hidden = b.dataset.view !== 'activity'; }));
 document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
