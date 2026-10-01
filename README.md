@@ -75,7 +75,7 @@ Note the summary ending in `…` — that is the 180-character first-sentence ca
 
 - [Live run against real data](#live-run-against-real-data)
 - [How it fits together](#how-it-fits-together)
-- [Try it locally](#try-it-locally)
+- [Run the project step by step](#run-the-project-step-by-step)
 - [Install the extension](#install-the-extension-in-chrome-or-edge)
 - [Connect Airtable](#connect-airtable)
 - [Connect Ghost drafts](#connect-ghost-drafts)
@@ -114,23 +114,76 @@ The panel is injected by [`extension/content.js`](extension/content.js) into a *
 
 ---
 
-## Try it locally
+## Run the project step by step
 
-Requires **Node.js 20.19+**. No npm dependencies and no build step.
+### Prerequisites
+
+- **Node.js 20.19+** — check with `node --version`. No npm dependencies and no build step.
+- Chrome or Edge (Manifest V3) if you want to use the extension.
+- For live mode: an Airtable personal access token with `data.records:read` and `data.records:write` scoped to your base, plus your base and table IDs. A Ghost Custom Integration **Admin API key** is optional — Airtable review works without it.
+
+### Step 1 — Start the server (demo mode, no credentials)
+
+Demo mode is the default. It is loopback-only, never contacts Airtable or Ghost, and needs no credentials.
 
 ```sh
 npm start
 ```
 
+You should see `Opportunities server (demo) listening on http://127.0.0.1:8787`.
+
 Open **http://localhost:8787**. The demo contains six sample opportunities, a simulated newsletter draft, and the same panel and HTTP endpoints the extension uses. Changes persist in `data/state.json`, and the central draft preview updates as you add and swap opportunities.
 
-Demo mode is loopback-only, never contacts Airtable or Ghost, and needs no credentials. To reset it, stop the server and rename `data/state.json` before restarting.
+To reset the demo, stop the server (`Ctrl+C`) and rename `data/state.json` before restarting.
 
 > **Do not reset a live server's state this way.** It holds audit and duplicate-request history.
 
----
+### Step 2 — Get your editor token
 
-## Install the extension in Chrome or Edge
+- **Demo:** click **Copy demo token** in the local demo page.
+- **Live:** copy the token value out of `EDITOR_TOKENS` in your `.env` — the long hex string on the right-hand side of the JSON map, e.g. `{"editor@example.com":"<paste-this-hex-string>"}`. Generate new ones with:
+  ```sh
+  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  ```
+  Restart the server after adding or removing tokens.
+
+### Step 3 — Switch to live mode (skip for demo-only use)
+
+Copy `.env.example` to `.env`, set `MODE=live`, and fill in your credentials. Full field reference is under [Connect Airtable](#connect-airtable) and [Connect Ghost drafts](#connect-ghost-drafts); the minimum is:
+
+```dotenv
+MODE=live
+AIRTABLE_TOKEN=your-personal-access-token
+AIRTABLE_BASE_ID=appYourBase
+AIRTABLE_TABLE_ID=tblYourTable
+EDITOR_TOKENS={"editor@example.com":"your-random-hex-token"}
+GHOST_URL=https://your-ghost-site.com
+GHOST_ADMIN_KEY=integration-id:secret
+```
+
+Restart the server (`Ctrl+C`, then `npm start`). It should report `Opportunities server (live) listening on ...`. Keep Airtable and Ghost keys in the server environment — **never paste them into extension settings and never commit `.env`**.
+
+### Step 4 — Smoke-test the server
+
+Replace `<TOKEN>` with your editor token from Step 2:
+
+```sh
+curl -s http://127.0.0.1:8787/health
+# → {"ok":true}
+
+curl -s -H "Authorization: Bearer <TOKEN>" http://127.0.0.1:8787/api/session
+# → {"editor":"...","mode":"live","ghost":true,...} — ghost must be true if you configured Ghost
+
+curl -s -H "Authorization: Bearer <TOKEN>" http://127.0.0.1:8787/api/opportunities | head -c 500
+# → your Airtable records
+
+curl -s -H "Authorization: Bearer <TOKEN>" http://127.0.0.1:8787/api/drafts | head -c 500
+# → up to 100 unpublished draft posts (posts only, not pages)
+```
+
+Common failures: `401` means a wrong editor token; `503 ghost` means the Ghost URL/key is missing or invalid; `502 upstream` means Airtable or Ghost was unreachable — check the server terminal log.
+
+### Step 5 — Load the extension
 
 1. Open `chrome://extensions` (or `edge://extensions`).
 2. Enable **Developer mode**.
@@ -138,10 +191,33 @@ Demo mode is loopback-only, never contacts Airtable or Ghost, and needs no crede
 4. The connection settings page opens. For the demo, use:
    - Sync server URL: `http://localhost:8787`
    - Ghost Admin URL: `http://localhost:8787/mock-ghost/`
-   - Editor access token: click **Copy demo token** in the local demo and paste it here.
+   - Editor access token: the token from Step 2.
 5. Click **Save & test connection** and allow access to those local addresses.
 6. Open **http://localhost:8787/mock-ghost/** and reload. This page omits the embedded preview panel so you can test the installed extension itself.
 7. Pin the extension in your toolbar. Its icon, or the panel's edge handle, toggles the panel.
+
+For a real Ghost instance, enter its Admin address (e.g. `https://your-publication.com/ghost/`) and your deployed sync server URL, then reload existing Ghost tabs.
+
+### Step 6 — Do your first live actions (use a throwaway draft)
+
+1. Approve an opportunity.
+2. Select the intended newsletter draft and click **Add to draft**, confirming the named target.
+3. **Save any unsaved Ghost editor changes before syncing**, and **reload the Ghost draft afterwards** so its editor loads the new server revision.
+
+### Step 7 — Verify and stop
+
+```sh
+npm run check   # JS syntax + extension assets
+npm test        # built-in test runner, loopback HTTP
+```
+
+Stop the server with `Ctrl+C`. The token is held in `chrome.storage.session` and expires when the browser closes or the extension reloads — reconnect with your editor token afterwards. **Disconnect editor session** in the panel clears it immediately.
+
+---
+
+## Install the extension in Chrome or Edge
+
+Follow [Step 5 under Run the project](#run-the-project-step-by-step) for the full install walkthrough. Notes that apply after installing:
 
 For a real Ghost instance, enter its Admin address (e.g. `https://your-publication.com/ghost/`) and your deployed sync server URL. Reload existing Ghost tabs after connecting or updating the extension. The content script is registered only for the configured Ghost origin and `/ghost/*` routes; the demo uses a separate `/mock-ghost/*` route.
 

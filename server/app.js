@@ -5,7 +5,17 @@ import { fileURLToPath } from 'node:url';
 import { resolve, extname } from 'node:path';
 import { HttpError, assert, draftOpportunityTitles, parseCommand, revision, safeId, validatePatch } from './domain.js';
 import { airtableAdapter, ghostAdapter } from './adapters.js';
+import { relevanceAdapter } from './llm.js';
 import { createStore, demoAdapters } from './store.js';
+
+// Funders we will not feature. Extend the list to add more; substring match with a
+// Taiwan guard (so "Republic of China (Taiwan)" is never caught by "china").
+const BLOCKED_FUNDER_COUNTRIES = ['russia', 'china'];
+const blockedFunder = name => {
+  const s = String(name || '').toLowerCase().trim();
+  if (!s || s === 'unknown' || s.includes('taiwan')) return false;
+  return BLOCKED_FUNDER_COUNTRIES.some(c => s.includes(c)) || /\bprc\b/.test(s);
+};
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sameToken = (a, b) => typeof a === 'string' && typeof b === 'string' && Buffer.byteLength(a) === Buffer.byteLength(b) && timingSafeEqual(Buffer.from(a), Buffer.from(b));
@@ -27,6 +37,8 @@ export async function createApp(config = {}) {
   const store = await createStore(config.dataDir || resolve(root, 'data'));
   const adapters = demo ? demoAdapters(store) : { airtable: airtableAdapter(config.airtable), ghost: config.ghost?.url && config.ghost?.key ? ghostAdapter(config.ghost) : null };
   const { airtable, ghost } = config.adapters || adapters;
+  const relevance = config.relevance || (config.anthropicKey ? relevanceAdapter({ apiKey: config.anthropicKey, model: config.llmModel, workspaceId: config.anthropicWorkspaceId }) : null);
+  const relevanceCache = new Map();
   let tail = Promise.resolve();
   const serialize = fn => { const result = tail.then(fn); tail = result.catch(() => {}); return result; };
   const server = createServer(async (req, res) => {
@@ -59,6 +71,34 @@ export async function createApp(config = {}) {
       if (url.pathname === '/api/opportunities' && req.method === 'GET') return send(200, { records: await airtable.list() });
       if (url.pathname === '/api/drafts' && req.method === 'GET') return send(200, { drafts: ghost ? (await ghost.list()).map(summarizeDraft) : [] });
       if (url.pathname === '/api/activity' && req.method === 'GET') return send(200, { activity: store.state.activity.slice(0, 50) });
+      if (url.pathname === '/api/relevance' && req.method === 'GET') {
+        if (!relevance) return send(200, { scores: {}, excluded: [] });
+        // Ranking is draft-independent: urgency + geographic reach + funder. Re-scored
+        // once per day (urgency shifts as deadlines approach). Only pending/approved
+        // are ever surfaced, so don't score rejected.
+        const today = new Date().toISOString().slice(0, 10);
+        const records = (await airtable.list()).filter(r => r.status === 'pending' || r.status === 'approved');
+        const results = {}; const missing = [];
+        for (const r of records) {
+          const key = revision([r.id, r.revision, today]);
+          const hit = relevanceCache.get(key);
+          if (hit) results[r.id] = hit; else missing.push({ record: r, key });
+        }
+        if (missing.length) {
+          const scored = await relevance.score(today, missing.map(m => m.record));
+          for (const m of missing) { const value = scored.get(m.record.id); if (value) { relevanceCache.set(m.key, value); results[m.record.id] = value; } }
+          if (relevanceCache.size > 2000) { let drop = relevanceCache.size - 2000; for (const k of relevanceCache.keys()) { if (drop-- <= 0) break; relevanceCache.delete(k); } }
+        }
+        // Hard exclusion (Russia/China funders): field value wins, else the model's
+        // inferred country. Enforced here so it never depends on the model's memory.
+        const scores = {}; const excluded = [];
+        for (const r of records) {
+          const res = results[r.id]; if (!res) continue;
+          if (blockedFunder(r.funderCountry || res.country)) excluded.push(r.id);
+          else scores[r.id] = { score: res.score, reason: res.reason };
+        }
+        return send(200, { scores, excluded });
+      }
       if (url.pathname === '/api/demo-draft' && req.method === 'GET') { assert(demo, 404, 'Not found.'); return send(200, { post: await ghost.get('demoDraft') }); }
       assert(['POST', 'PATCH'].includes(req.method), 404, 'Endpoint not found.');
       assert(req.headers['content-type']?.includes('application/json'), 415, 'Use application/json.');

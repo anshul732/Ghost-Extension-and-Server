@@ -1,6 +1,6 @@
 import { HttpError, assert, ghostToken, patchDraft, revision } from './domain.js';
 
-export const fields = { title: 'Title', organization: 'Organization', summary: 'Summary', url: 'URL', deadline: 'Deadline', category: 'Category', status: 'Status' };
+export const fields = { title: 'Title', organization: 'Organization', summary: 'Summary', url: 'URL', deadline: 'Deadline', category: 'Category', status: 'Status', region: 'Region', funderCountry: 'Funder Country' };
 export async function upstream(url, init = {}, fetcher = fetch) {
   for (let attempt = 0; attempt < 3; attempt++) {
     let response;

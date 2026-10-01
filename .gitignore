@@ -1,8 +1,33 @@
+# Secrets — server-only credentials, never commit
 .env
 .env.*
 !.env.example
+
+# Runtime state (demo + live): audit history, idempotency keys, drafts
 data/
+*.tmp
+
+# Package output
 dist/
+
+# Dependencies (repo has none, but keep it safe)
 node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Generated tooling output (Archify diagrams, receipts, screenshots)
+.archify/
+
+# Local editor / agent settings
+.claude/
+
+# Personal notes — kept local, not for publishing
+EXPLANATION.md
+EXPLANATION.html
+INCONSISTENCIES.md
+
+# OS
 .DS_Store
-artifacts/
+Thumbs.db
