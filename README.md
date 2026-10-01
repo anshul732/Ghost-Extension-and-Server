@@ -1,5 +1,6 @@
 # Opportunities — Ghost Editorial Companion
 
+
 A Manifest V3 browser extension and a small Node.js sync server that let editors review Airtable records, approve or reject opportunities, edit their content, and place dedicated opportunity cards into Ghost drafts — without leaving Ghost Admin.
 
 The server owns the Airtable and Ghost credentials. The extension only ever receives a per-editor token and reaches the outside world through its background service worker.
