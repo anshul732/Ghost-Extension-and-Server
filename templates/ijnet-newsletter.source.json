@@ -1,0 +1,299 @@
+  {
+  "_meta": {
+    "description": "General reusable Lexical template for the IJNet weekly newsletter family (Blueprints + Investigative editions). Every top-level node carries a `sectionLabel` so automation and localization can target sections independently. Values in {{double braces}} are placeholders to be filled per issue.",
+    "controlledVocabularies": {
+      "sectionLabels": ["EDITORS_NOTE", "INSIGHTS", "CASES", "RESOURCES", "UPDATES", "OPPORTUNITIES", "FOOTER"],
+      "itemTags_blueprints": ["DESIGN", "PRODUCT", "ACTION"],
+      "itemTags_investigative": ["FORENSICS", "SENSEMAKING", "ANALYSIS"],
+      "subHeaders": {
+        "INSIGHTS": ["RESEARCH"],
+        "RESOURCES": ["BREAKDOWNS", "SPOTLIGHT"],
+        "UPDATES": ["TAKEAWAYS", "ANNOUNCEMENTS"]
+      },
+      "translatable": ["editorsNote", "itemBody", "spotlight", "takeaway", "announcement", "opportunityTitle", "opportunityMeta"],
+      "doNotTranslate": ["tag", "sectionLabel", "byline_source", "deadline", "url", "sender/publisher names", "footer boilerplate"]
+    },
+    "itemShape": "Every content item = { tag (from vocabulary), body (one sentence, one inline link), source (byline) }",
+    "editionDefaults": {
+      "blueprints": { "editor": "Priscila Brito", "signoff": "Until next Wednesday,", "tags": "itemTags_blueprints" },
+      "investigative": { "editor": "H R Venkatesh, Editor, IJNet", "signoff": "Here's to the work that keeps power accountable!", "tags": "itemTags_investigative" }
+    }
+  },
+
+  "root": {
+    "type": "root",
+    "version": 1,
+    "direction": "ltr",
+    "format": "",
+    "indent": 0,
+    "children": [
+
+      {
+        "type": "image",
+        "version": 1,
+        "sectionLabel": "HEADER_LOGO",
+        "src": "{{HEADER_LOGO_URL}}",
+        "altText": "",
+        "width": 520
+      },
+
+      {
+        "type": "callout",
+        "version": 1,
+        "sectionLabel": "EDITORS_NOTE",
+        "_note": "Italic intro. Contains 1 highlighted tagline span and a sign-off. Fully translatable.",
+        "children": [
+          { "type": "paragraph", "version": 1, "children": [
+            { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "", "text": "{{EDITORS_NOTE_BODY}}" }
+          ]},
+          { "type": "paragraph", "version": 1, "children": [
+            { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "background-color: rgb(255,249,148)", "text": "{{EDITORS_NOTE_TAGLINE}}" }
+          ]},
+          { "type": "paragraph", "version": 1, "children": [
+            { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "", "text": "{{SIGNOFF}} — {{EDITOR_NAME}}" }
+          ]}
+        ]
+      },
+
+      { "type": "heading", "version": 1, "tag": "h1", "sectionLabel": "SECTION_HEADER:INSIGHTS", "children": [
+        { "type": "extended-text", "version": 1, "text": "INSIGHTS", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+      ]},
+      { "type": "hr", "version": 1 },
+
+      { "type": "heading", "version": 1, "tag": "h3", "sectionLabel": "SUBSECTION_HEADER:RESEARCH", "children": [
+        { "type": "extended-text", "version": 1, "text": "{{SUBHEADER_INSIGHTS}}", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+      ]},
+
+      {
+        "type": "columns",
+        "version": 1,
+        "sectionLabel": "INSIGHTS_ROW",
+        "_note": "Repeatable 3-column row. Each column is one item (tag / body+link / source).",
+        "columns": [
+          {
+            "columnLabel": "ITEM",
+            "children": [
+              { "type": "paragraph", "version": 1, "children": [
+                { "type": "extended-text", "version": 1, "format": 1, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_TAG}}" }
+              ]},
+              { "type": "paragraph", "version": 1, "children": [
+                { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_BODY_BEFORE_LINK}}" },
+                { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_LINK_TEXT}}", "url": "{{ITEM_URL}}" },
+                { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_BODY_AFTER_LINK}}" }
+              ]},
+              { "type": "paragraph", "version": 1, "children": [
+                { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "color: rgb(112,112,112)", "text": "by {{ITEM_SOURCE}}" }
+              ]}
+            ]
+          }
+        ]
+      },
+
+      {
+        "type": "columns",
+        "version": 1,
+        "sectionLabel": "SURVEY_CTA_ROW",
+        "_note": "OPTIONAL. Present in Blueprints editions; omit if the edition has none.",
+        "columns": [
+          { "columnLabel": "SURVEY_TEXT", "children": [
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "", "text": "{{SURVEY_TEXT}}" },
+              { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "", "text": "contact us", "url": "{{CONTACT_URL}}" }
+            ]}
+          ]},
+          { "columnLabel": "SURVEY_BUTTON", "children": [
+            { "type": "button", "version": 1, "buttonText": "take our survey", "buttonUrl": "{{SURVEY_URL}}", "alignment": "center" }
+          ]}
+        ]
+      },
+
+      { "type": "heading", "version": 1, "tag": "h2", "sectionLabel": "SECTION_HEADER:CASES", "children": [
+        { "type": "extended-text", "version": 1, "text": "CASES", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+      ]},
+
+      {
+        "type": "columns",
+        "version": 1,
+        "sectionLabel": "CASES_ROW",
+        "_note": "3-column row, same ITEM shape as INSIGHTS_ROW.",
+        "columns": [
+          { "columnLabel": "ITEM", "children": [
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 1, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_TAG}}" }
+            ]},
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_BODY_BEFORE_LINK}}" },
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_LINK_TEXT}}", "url": "{{ITEM_URL}}" },
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_BODY_AFTER_LINK}}" }
+            ]},
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "color:#707070", "text": "{{ITEM_SOURCE_PREFIX}} {{ITEM_SOURCE}}" }
+            ]}
+          ]}
+        ]
+      },
+
+      { "type": "heading", "version": 1, "tag": "h1", "sectionLabel": "SECTION_HEADER:RESOURCES", "children": [
+        { "type": "extended-text", "version": 1, "text": "RESOURCES", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+      ]},
+      { "type": "hr", "version": 1 },
+
+      { "type": "heading", "version": 1, "tag": "h2", "sectionLabel": "SUBSECTION_HEADER:BREAKDOWNS", "children": [
+        { "type": "extended-text", "version": 1, "text": "BREAKDOWNS", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+      ]},
+
+      {
+        "type": "columns",
+        "version": 1,
+        "sectionLabel": "BREAKDOWNS_ROW",
+        "_note": "2-column row: a wide item (2/3, may have 2 body paragraphs) + a narrow item (1/3).",
+        "columns": [
+          { "columnLabel": "ITEM_WIDE", "children": [
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 1, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_TAG}}" }
+            ]},
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_LINK_TEXT}}", "url": "{{ITEM_URL}}" },
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_BODY}}" }
+            ]},
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "color: rgb(112,112,112)", "text": "by {{ITEM_SOURCE}}" }
+            ]}
+          ]},
+          { "columnLabel": "ITEM_NARROW", "children": [
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 1, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_TAG}}" }
+            ]},
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_BODY_BEFORE_LINK}}" },
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_LINK_TEXT}}", "url": "{{ITEM_URL}}" },
+              { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{ITEM_BODY_AFTER_LINK}}" }
+            ]},
+            { "type": "paragraph", "version": 1, "children": [
+              { "type": "extended-text", "version": 1, "format": 2, "detail": 0, "mode": "normal", "style": "color: rgb(112,112,112)", "text": "by {{ITEM_SOURCE}}" }
+            ]}
+          ]}
+        ]
+      },
+
+      {
+        "type": "callout",
+        "version": 1,
+        "sectionLabel": "SPOTLIGHT",
+        "backgroundColor": "accent-double-border",
+        "_note": "Highlighted box with blue double border. Fixed sub-structure: colored SPOTLIGHT label, a tag, then The What / The How / The Why (bold labels).",
+        "children": [
+          { "type": "heading", "version": 1, "tag": "h3", "children": [
+            { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "color: rgb(4,178,245)", "text": "SPOTLIGHT" }
+          ]},
+          { "type": "paragraph", "version": 1, "children": [
+            { "type": "extended-text", "version": 1, "format": 1, "detail": 0, "mode": "normal", "style": "color: rgb(4,178,245)", "text": "{{ITEM_TAG}}" }
+          ]},
+          { "type": "paragraph", "version": 1, "children": [
+            { "type": "extended-text", "version": 1, "format": 3, "detail": 0, "mode": "normal", "style": "", "text": "The What: " },
+            { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{SPOTLIGHT_WHAT_BEFORE_LINK}}" },
+            { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{SPOTLIGHT_LINK_TEXT}}", "url": "{{SPOTLIGHT_URL}}" },
+            { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{SPOTLIGHT_WHAT_AFTER_LINK}}" }
+          ]},
+          { "type": "paragraph", "version": 1, "children": [
+            { "type": "extended-text", "version": 1, "format": 3, "detail": 0, "mode": "normal", "style": "", "text": "The How: " },
+            { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{SPOTLIGHT_HOW}}" }
+          ]},
+          { "type": "paragraph", "version": 1, "children": [
+            { "type": "extended-text", "version": 1, "format": 3, "detail": 0, "mode": "normal", "style": "", "text": "The Why: " },
+            { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{SPOTLIGHT_WHY}}" }
+          ]}
+        ]
+      },
+
+      { "type": "heading", "version": 1, "tag": "h1", "sectionLabel": "SECTION_HEADER:UPDATES", "children": [
+        { "type": "extended-text", "version": 1, "text": "UPDATES", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+      ]},
+      { "type": "hr", "version": 1 },
+
+      {
+        "type": "columns",
+        "version": 1,
+        "sectionLabel": "UPDATES_ROW",
+        "_note": "2-column: TAKEAWAYS + ANNOUNCEMENTS, each a bullet list. Each bullet = 'from {source}: {linked headline}'.",
+        "columns": [
+          { "columnLabel": "TAKEAWAYS", "children": [
+            { "type": "heading", "version": 1, "tag": "h3", "children": [
+              { "type": "extended-text", "version": 1, "text": "TAKEAWAYS", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+            ]},
+            { "type": "list", "version": 1, "listType": "bullet", "start": 1, "children": [
+              { "type": "listitem", "version": 1, "children": [
+                { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "from {{SOURCE}}: " },
+                { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{HEADLINE}}", "url": "{{URL}}" }
+              ]}
+            ]}
+          ]},
+          { "columnLabel": "ANNOUNCEMENTS", "children": [
+            { "type": "heading", "version": 1, "tag": "h3", "children": [
+              { "type": "extended-text", "version": 1, "text": "ANNOUNCEMENTS", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+            ]},
+            { "type": "list", "version": 1, "listType": "bullet", "start": 1, "children": [
+              { "type": "listitem", "version": 1, "children": [
+                { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "from {{SOURCE}}: " },
+                { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "{{HEADLINE}}", "url": "{{URL}}" }
+              ]}
+            ]}
+          ]}
+        ]
+      },
+
+      { "type": "heading", "version": 1, "tag": "h1", "sectionLabel": "SECTION_HEADER:OPPORTUNITIES", "children": [
+        { "type": "extended-text", "version": 1, "text": "OPPORTUNITIES", "format": 0, "detail": 0, "mode": "normal", "style": "" }
+      ]},
+      { "type": "hr", "version": 1 },
+
+      {
+        "type": "columns",
+        "version": 1,
+        "sectionLabel": "OPPORTUNITIES_GRID",
+        "_note": "4-column grid; each column holds 1-2 opportunity_card nodes. Repeat the card as needed.",
+        "columns": [
+          { "columnLabel": "OPPORTUNITY_COLUMN", "children": [
+            {
+              "type": "opportunity_card",
+              "version": 1,
+              "tag": "{{ITEM_TAG}}",
+              "title": "{{OPPORTUNITY_TITLE}}",
+              "meta": "{{OPPORTUNITY_META}}",
+              "deadline": "{{DEADLINE}}",
+              "url": "{{OPPORTUNITY_URL}}"
+            }
+          ]}
+        ]
+      },
+
+      { "type": "hr", "version": 1, "sectionLabel": "FOOTER_DIVIDER", "style": "accent" },
+
+      {
+        "type": "html",
+        "version": 1,
+        "sectionLabel": "FOOTER_LINKS",
+        "_note": "Boilerplate — do not translate mechanically; keep Mailchimp merge tags intact.",
+        "html": "<p><em>Not displaying properly? <a href=\"{{VIEW_URL}}\">View</a> this email in your browser. Was this a forward? <a href=\"{{SUBSCRIBE_URL}}\">Subscribe</a> here. Not vibing with our emails? <a href=\"{{UNSUBSCRIBE_URL}}\">Unsubscribe</a> anytime. Found this useful? <a href=\"{{FORWARD_URL}}\">Share</a> it. Want to change how you get these emails? <a href=\"{{PREFERENCES_URL}}\">Update</a> preferences.</em></p>"
+      },
+
+      {
+        "type": "html",
+        "version": 1,
+        "sectionLabel": "SOCIAL_ICONS",
+        "html": "<p><a href=\"{{FACEBOOK_URL}}\">Facebook</a> · <a href=\"{{INSTAGRAM_URL}}\">Instagram</a> · <a href=\"{{X_URL}}\">X</a></p>"
+      },
+
+      { "type": "paragraph", "version": 1, "sectionLabel": "PUBLISHER_COPYRIGHT", "children": [
+        { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "Published by International Center for Journalists. Copyright © {{YEAR}} all rights reserved. IJNet material may not be reproduced or republished without express written permission." }
+      ]},
+
+      { "type": "paragraph", "version": 1, "sectionLabel": "SUPPORTED_BY_LABEL", "children": [
+        { "type": "extended-text", "version": 1, "format": 0, "detail": 0, "mode": "normal", "style": "", "text": "Supported by" }
+      ]},
+
+      { "type": "image", "version": 1, "sectionLabel": "SUPPORTER_LOGO", "src": "{{SUPPORTER_LOGO_URL}}", "altText": "", "width": 106 }
+
+    ]
+  }
+}

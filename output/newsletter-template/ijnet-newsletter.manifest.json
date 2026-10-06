@@ -1,0 +1,398 @@
+{
+  "version": 1,
+  "issueId": "ijnet-blueprints-test-001",
+  "locale": "en",
+  "edition": "blueprints",
+  "sourceMetadata": {
+    "description": "General reusable Lexical template for the IJNet weekly newsletter family (Blueprints + Investigative editions). Every top-level node carries a `sectionLabel` so automation and localization can target sections independently. Values in {{double braces}} are placeholders to be filled per issue.",
+    "controlledVocabularies": {
+      "sectionLabels": [
+        "EDITORS_NOTE",
+        "INSIGHTS",
+        "CASES",
+        "RESOURCES",
+        "UPDATES",
+        "OPPORTUNITIES",
+        "FOOTER"
+      ],
+      "itemTags_blueprints": [
+        "DESIGN",
+        "PRODUCT",
+        "ACTION"
+      ],
+      "itemTags_investigative": [
+        "FORENSICS",
+        "SENSEMAKING",
+        "ANALYSIS"
+      ],
+      "subHeaders": {
+        "INSIGHTS": [
+          "RESEARCH"
+        ],
+        "RESOURCES": [
+          "BREAKDOWNS",
+          "SPOTLIGHT"
+        ],
+        "UPDATES": [
+          "TAKEAWAYS",
+          "ANNOUNCEMENTS"
+        ]
+      },
+      "translatable": [
+        "editorsNote",
+        "itemBody",
+        "spotlight",
+        "takeaway",
+        "announcement",
+        "opportunityTitle",
+        "opportunityMeta"
+      ],
+      "doNotTranslate": [
+        "tag",
+        "sectionLabel",
+        "byline_source",
+        "deadline",
+        "url",
+        "sender/publisher names",
+        "footer boilerplate"
+      ]
+    },
+    "itemShape": "Every content item = { tag (from vocabulary), body (one sentence, one inline link), source (byline) }",
+    "editionDefaults": {
+      "blueprints": {
+        "editor": "Priscila Brito",
+        "signoff": "Until next Wednesday,",
+        "tags": "itemTags_blueprints"
+      },
+      "investigative": {
+        "editor": "H R Venkatesh, Editor, IJNet",
+        "signoff": "Here's to the work that keeps power accountable!",
+        "tags": "itemTags_investigative"
+      }
+    }
+  },
+  "sections": [
+    {
+      "version": 1,
+      "id": "header-logo",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 0,
+      "sourceLabel": "HEADER_LOGO",
+      "elementIds": [
+        "header-logo"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "editors-note",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 1,
+      "sourceLabel": "EDITORS_NOTE",
+      "elementIds": [
+        "editors-note"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "section-header-insights",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 2,
+      "sourceLabel": "SECTION_HEADER:INSIGHTS",
+      "elementIds": [
+        "section-header-insights"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "divider-3",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 3,
+      "sourceLabel": null,
+      "elementIds": [
+        "divider-3"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "subsection-header-research",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 4,
+      "sourceLabel": "SUBSECTION_HEADER:RESEARCH",
+      "elementIds": [
+        "subsection-header-research"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "insights-row",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 5,
+      "sourceLabel": "INSIGHTS_ROW",
+      "elementIds": [
+        "insights-row-item-1",
+        "insights-row-item-2",
+        "insights-row-item-3"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "survey-cta-row",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 6,
+      "sourceLabel": "SURVEY_CTA_ROW",
+      "elementIds": [
+        "survey-cta-row-item-1",
+        "survey-cta-row-item-2"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "section-header-cases",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 7,
+      "sourceLabel": "SECTION_HEADER:CASES",
+      "elementIds": [
+        "section-header-cases"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "cases-row",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 8,
+      "sourceLabel": "CASES_ROW",
+      "elementIds": [
+        "cases-row-item-1",
+        "cases-row-item-2",
+        "cases-row-item-3"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "section-header-resources",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 9,
+      "sourceLabel": "SECTION_HEADER:RESOURCES",
+      "elementIds": [
+        "section-header-resources"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "divider-10",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 10,
+      "sourceLabel": null,
+      "elementIds": [
+        "divider-10"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "subsection-header-breakdowns",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 11,
+      "sourceLabel": "SUBSECTION_HEADER:BREAKDOWNS",
+      "elementIds": [
+        "subsection-header-breakdowns"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "breakdowns-row",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 12,
+      "sourceLabel": "BREAKDOWNS_ROW",
+      "elementIds": [
+        "breakdowns-row-item-1",
+        "breakdowns-row-item-2"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "spotlight",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 13,
+      "sourceLabel": "SPOTLIGHT",
+      "elementIds": [
+        "spotlight"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "section-header-updates",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 14,
+      "sourceLabel": "SECTION_HEADER:UPDATES",
+      "elementIds": [
+        "section-header-updates"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "divider-15",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 15,
+      "sourceLabel": null,
+      "elementIds": [
+        "divider-15"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "updates-row",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 16,
+      "sourceLabel": "UPDATES_ROW",
+      "elementIds": [
+        "updates-row-item-1",
+        "updates-row-item-2"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "section-header-opportunities",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 17,
+      "sourceLabel": "SECTION_HEADER:OPPORTUNITIES",
+      "elementIds": [
+        "section-header-opportunities"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "divider-18",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 18,
+      "sourceLabel": null,
+      "elementIds": [
+        "divider-18"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "opportunities-grid",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 19,
+      "sourceLabel": "OPPORTUNITIES_GRID",
+      "elementIds": [
+        "example-record-1",
+        "example-record-2",
+        "example-record-3",
+        "example-record-4"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "footer-divider",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 20,
+      "sourceLabel": "FOOTER_DIVIDER",
+      "elementIds": [
+        "footer-divider"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "footer-links",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 21,
+      "sourceLabel": "FOOTER_LINKS",
+      "elementIds": [
+        "footer-links"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "social-icons",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 22,
+      "sourceLabel": "SOCIAL_ICONS",
+      "elementIds": [
+        "social-icons"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "publisher-copyright",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 23,
+      "sourceLabel": "PUBLISHER_COPYRIGHT",
+      "elementIds": [
+        "publisher-copyright"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "supported-by-label",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 24,
+      "sourceLabel": "SUPPORTED_BY_LABEL",
+      "elementIds": [
+        "supported-by-label"
+      ]
+    },
+    {
+      "version": 1,
+      "id": "supporter-logo",
+      "issueId": "ijnet-blueprints-test-001",
+      "locale": "en",
+      "edition": "blueprints",
+      "sourceIndex": 25,
+      "sourceLabel": "SUPPORTER_LOGO",
+      "elementIds": [
+        "supporter-logo"
+      ]
+    }
+  ]
+}

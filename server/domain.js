@@ -1,4 +1,5 @@
 import { createHash, createHmac } from 'node:crypto';
+import { managedGrid, patchGrid } from './newsletter.js';
 
 export class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -22,9 +23,9 @@ export function validatePatch(input) {
   if (out.deadline) { const date = new Date(out.deadline); assert(/^\d{4}-\d{2}-\d{2}$/.test(out.deadline) && !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === out.deadline, 400, 'Use a valid deadline date.'); }
   return out;
 }
-// Opportunities are written as ordinary Lexical text, never as HTML cards, so
-// editors can retype them in Ghost. Nothing here emits markup, so record values
-// need no HTML escaping: they travel as plain text node content.
+// Legacy drafts use ordinary Lexical text. Managed newsletters use an HTML grid.
+// Native text nodes below carry record values as plain text; the grid renderer
+// separately escapes its values before producing HTML.
 export const SECTION_HEADING = 'Opportunity';
 const text = value => ({ type: 'extended-text', version: 1, text: String(value ?? ''), format: 0, detail: 0, mode: 'normal', style: '' });
 const paragraph = children => ({ type: 'paragraph', version: 1, format: '', indent: 0, direction: 'ltr', children });
@@ -43,20 +44,30 @@ export function opportunityNodes(record) {
   if (url) meta.push(text(' · '), link(url));
   return [heading('h3', record.title), paragraph([text(opportunitySummary(record))]), paragraph(meta)];
 }
-// Draft membership is read back from the document itself: each opportunity is the
-// h3 whose text is its title. Titles, not record IDs, are the link between the two.
+// Managed grids use stable IDs; legacy native-text drafts still match h3 titles.
 export function draftOpportunityTitles(post) {
   let doc; try { doc = JSON.parse(post.lexical); } catch { return []; }
+  const grid = managedGrid(doc);
+  if (grid) return grid.meta.items.map(i => i.title);
   const children = doc.root?.children || [];
   const start = children.findIndex(n => n.tag === 'h2' && headingText(n) === SECTION_HEADING);
   if (start < 0) return [];
   return children.slice(start + 1).filter(n => n.tag === 'h3').map(headingText).filter(Boolean);
+}
+export function draftOpportunityIds(post) {
+  let doc; try { doc = JSON.parse(post.lexical); } catch { return null; }
+  return managedGrid(doc)?.meta.items.map(i => i.id) ?? null;
 }
 // Preserve the entire Lexical document. Only our own opportunity blocks are replaced.
 export function patchDraft(post, record, remove, options = {}) {
   assert(post.status === 'draft' || (post.status === 'published' && options.approvalPostId === post.id), 409, 'Only unpublished drafts can be changed.');
   let doc; try { doc = JSON.parse(post.lexical); } catch { throw new HttpError(409, 'This draft has no valid Lexical document. Open and save it in Ghost first.'); }
   assert(Array.isArray(doc.root?.children), 409, 'Unsupported draft document.');
+  try {
+    const grid = managedGrid(doc);
+    if (grid) return patchGrid(grid, record, remove) ? JSON.stringify(doc) : null;
+    assert(!doc.root.children.some(n => n.type === 'html' && String(n.html).includes('<!--ijnet:')), 409, 'The managed opportunity grid is missing. Restore it before adding records.');
+  } catch (error) { throw new HttpError(409, error.message); }
   const children = doc.root.children;
   const existing = draftOpportunityTitles(post);
   assert(record.title, 409, 'This opportunity needs a title before it can be added to a draft.');

@@ -490,6 +490,24 @@ output/      Demo video, captions, voiceover, poster,
 
 ## Reference documentation
 
+### Full IJNet newsletter template
+
+`templates/ijnet-newsletter.source.json` preserves the supplied design specification, all 26 blocks, translation rules and edition defaults. It is not an importable Ghost document: custom columns, callouts and opportunity cards are compiled to standard Ghost HTML cards. Complex sections are edited as HTML in Ghost, rather than native column widgets.
+
+Run `node scripts/newsletter-template.js` to regenerate illustrative files in `output/newsletter-template/`. Copy `issue.example.json`, fill its global values and independently scoped column values, then run `node scripts/newsletter-template.js /absolute/path/to/your-issue.json` for real content.
+
+- `ijnet-newsletter.lexical.json`: complete example with four illustrative opportunities.
+- `ijnet-newsletter-empty.lexical.json`: full newsletter with an empty four-column grid for extension inserts.
+- `ijnet-newsletter-draft.payload.json`: Ghost Admin API create-post body using the empty grid. Send through an authenticated server-side Admin API client; this is not a Ghost backup import file.
+- `ijnet-newsletter.manifest.json`: stable section IDs, element IDs, locale, edition and original metadata. Store with the issue for future localization; automatic translation and engagement tracking are not implemented.
+- `preview.html`: structural preview, not a Ghost email rendering test.
+
+Replace all sample copy and example.com URLs, including publicly hosted logo images. The source's Mailchimp footer note is preserved as metadata, but links are not automatically converted to Ghost subscriber-specific unsubscribe/preferences links. Configure and test those through Ghost before sending. Do not mail the example unchanged.
+
+HTML cards contain encoded JSON comments with stable section IDs. The opportunity grid stores Airtable record IDs and content in its comment; extension add/swap membership uses those IDs even after titles or headings change. Keep comments intact. Direct HTML edits to the grid are detected and rejected on the next extension write to avoid overwriting editorial changes; reconcile changes with issue data and regenerate. Older plain-text drafts retain title-based behavior. Non-opportunity item IDs follow column slots; preserve those slots during localization.
+
+Local compiler and integration tests cover structure and mutations. Saving/reopening in the deployed Ghost editor and testing email delivery remain required: comment retention, card rendering and four-column behavior on narrow email clients have not been verified against that installation.
+
 - [Chrome extension cross-origin requests](https://developer.chrome.com/docs/extensions/develop/concepts/network-requests)
 - [Chrome dynamically registered scripts](https://developer.chrome.com/docs/extensions/reference/api/scripting)
 - [Airtable personal access tokens](https://support.airtable.com/articles/9934989703-creating-personal-access-tokens)

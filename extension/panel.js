@@ -9,7 +9,7 @@ const rankByScore = list => hasScores() ? [...list].sort((a, b) => (scoreOf(b) -
 const selectedDraft = () => state.drafts.find(d => d.id === state.draftId);
 const draftTitles = () => selectedDraft()?.opportunityTitles || [];
 const isDraft = id => !!id && state.drafts.some(d => d.id === id);
-const inDraft = id => draftTitles().includes(state.records.find(r => r.id === id)?.title);
+const inDraft = id => Array.isArray(selectedDraft()?.opportunityIds) ? selectedDraft().opportunityIds.includes(id) : draftTitles().includes(state.records.find(r => r.id === id)?.title);
 const formatDate = date => { const d = new Date(date + 'T12:00:00'); return Number.isNaN(d.valueOf()) ? 'No deadline' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
 function notify(text, error = false) { const n = $('#notice'); n.textContent = text; n.className = `notice${error ? ' error' : ''}`; n.hidden = !text; }
 async function load(quiet = false) {

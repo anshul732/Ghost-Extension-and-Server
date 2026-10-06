@@ -1,0 +1,144 @@
+{
+  "id": "ijnet-blueprints-test-001",
+  "edition": "blueprints",
+  "locale": "en",
+  "includeSurvey": true,
+  "values": {
+    "HEADER_LOGO_URL": "https://example.com/header_logo_url",
+    "EDITORS_NOTE_BODY": "[Replace editors note body]",
+    "EDITORS_NOTE_TAGLINE": "[Replace editors note tagline]",
+    "SUBHEADER_INSIGHTS": "RESEARCH",
+    "ITEM_TAG": "DESIGN",
+    "ITEM_BODY_BEFORE_LINK": "[Replace item body before link]",
+    "ITEM_LINK_TEXT": "[Replace item link text]",
+    "ITEM_URL": "https://example.com/item_url",
+    "ITEM_BODY_AFTER_LINK": "[Replace item body after link]",
+    "ITEM_SOURCE": "[Replace item source]",
+    "SURVEY_TEXT": "[Replace survey text]",
+    "CONTACT_URL": "https://example.com/contact_url",
+    "SURVEY_URL": "https://example.com/survey_url",
+    "ITEM_SOURCE_PREFIX": "by",
+    "ITEM_BODY": "[Replace item body]",
+    "SPOTLIGHT_WHAT_BEFORE_LINK": "[Replace spotlight what before link]",
+    "SPOTLIGHT_LINK_TEXT": "[Replace spotlight link text]",
+    "SPOTLIGHT_URL": "https://example.com/spotlight_url",
+    "SPOTLIGHT_WHAT_AFTER_LINK": "[Replace spotlight what after link]",
+    "SPOTLIGHT_HOW": "[Replace spotlight how]",
+    "SPOTLIGHT_WHY": "[Replace spotlight why]",
+    "SOURCE": "[Replace source]",
+    "HEADLINE": "[Replace headline]",
+    "URL": "https://example.com/url",
+    "OPPORTUNITY_TITLE": "[Replace opportunity title]",
+    "OPPORTUNITY_META": "[Replace opportunity meta]",
+    "DEADLINE": "[Replace deadline]",
+    "OPPORTUNITY_URL": "https://example.com/opportunity_url",
+    "VIEW_URL": "https://example.com/view_url",
+    "SUBSCRIBE_URL": "https://example.com/subscribe_url",
+    "UNSUBSCRIBE_URL": "https://example.com/unsubscribe_url",
+    "FORWARD_URL": "https://example.com/forward_url",
+    "PREFERENCES_URL": "https://example.com/preferences_url",
+    "FACEBOOK_URL": "https://example.com/facebook_url",
+    "INSTAGRAM_URL": "https://example.com/instagram_url",
+    "X_URL": "https://example.com/x_url",
+    "YEAR": "2026",
+    "SUPPORTER_LOGO_URL": "https://example.com/supporter_logo_url"
+  },
+  "columns": {
+    "INSIGHTS_ROW": [
+      {
+        "ITEM_LINK_TEXT": "Research item 1",
+        "ITEM_SOURCE": "Source 1",
+        "ITEM_URL": "https://example.com/Research/1"
+      },
+      {
+        "ITEM_LINK_TEXT": "Research item 2",
+        "ITEM_SOURCE": "Source 2",
+        "ITEM_URL": "https://example.com/Research/2"
+      },
+      {
+        "ITEM_LINK_TEXT": "Research item 3",
+        "ITEM_SOURCE": "Source 3",
+        "ITEM_URL": "https://example.com/Research/3"
+      }
+    ],
+    "CASES_ROW": [
+      {
+        "ITEM_LINK_TEXT": "Case item 1",
+        "ITEM_SOURCE": "Source 1",
+        "ITEM_URL": "https://example.com/Case/1"
+      },
+      {
+        "ITEM_LINK_TEXT": "Case item 2",
+        "ITEM_SOURCE": "Source 2",
+        "ITEM_URL": "https://example.com/Case/2"
+      },
+      {
+        "ITEM_LINK_TEXT": "Case item 3",
+        "ITEM_SOURCE": "Source 3",
+        "ITEM_URL": "https://example.com/Case/3"
+      }
+    ],
+    "BREAKDOWNS_ROW": [
+      {
+        "ITEM_LINK_TEXT": "Breakdown item 1",
+        "ITEM_SOURCE": "Source 1",
+        "ITEM_URL": "https://example.com/Breakdown/1"
+      },
+      {
+        "ITEM_LINK_TEXT": "Breakdown item 2",
+        "ITEM_SOURCE": "Source 2",
+        "ITEM_URL": "https://example.com/Breakdown/2"
+      }
+    ],
+    "SURVEY_CTA_ROW": [
+      {},
+      {}
+    ],
+    "UPDATES_ROW": [
+      {
+        "HEADLINE": "Example takeaway",
+        "SOURCE": "Research source",
+        "URL": "https://example.com/takeaway"
+      },
+      {
+        "HEADLINE": "Example announcement",
+        "SOURCE": "News source",
+        "URL": "https://example.com/announcement"
+      }
+    ]
+  },
+  "opportunities": [
+    {
+      "id": "example-record-1",
+      "category": "DESIGN",
+      "title": "Example opportunity 1",
+      "summary": "Replace this sample with an Airtable opportunity.",
+      "deadline": "2026-12-31",
+      "url": "https://example.com/opportunity/1"
+    },
+    {
+      "id": "example-record-2",
+      "category": "DESIGN",
+      "title": "Example opportunity 2",
+      "summary": "Replace this sample with an Airtable opportunity.",
+      "deadline": "2026-12-31",
+      "url": "https://example.com/opportunity/2"
+    },
+    {
+      "id": "example-record-3",
+      "category": "DESIGN",
+      "title": "Example opportunity 3",
+      "summary": "Replace this sample with an Airtable opportunity.",
+      "deadline": "2026-12-31",
+      "url": "https://example.com/opportunity/3"
+    },
+    {
+      "id": "example-record-4",
+      "category": "DESIGN",
+      "title": "Example opportunity 4",
+      "summary": "Replace this sample with an Airtable opportunity.",
+      "deadline": "2026-12-31",
+      "url": "https://example.com/opportunity/4"
+    }
+  ]
+}

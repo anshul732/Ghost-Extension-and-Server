@@ -3,7 +3,7 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, extname } from 'node:path';
-import { HttpError, assert, draftOpportunityTitles, parseCommand, revision, safeId, validatePatch } from './domain.js';
+import { HttpError, assert, draftOpportunityTitles, draftOpportunityIds, parseCommand, revision, safeId, validatePatch } from './domain.js';
 import { airtableAdapter, ghostAdapter } from './adapters.js';
 import { relevanceAdapter } from './llm.js';
 import { createStore, demoAdapters } from './store.js';
@@ -19,7 +19,7 @@ const blockedFunder = name => {
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sameToken = (a, b) => typeof a === 'string' && typeof b === 'string' && Buffer.byteLength(a) === Buffer.byteLength(b) && timingSafeEqual(Buffer.from(a), Buffer.from(b));
-const summarizeDraft = d => ({ id: d.id, title: d.title, status: d.status, updatedAt: d.updated_at, opportunityTitles: draftOpportunityTitles(d) });
+const summarizeDraft = d => ({ id: d.id, title: d.title, status: d.status, updatedAt: d.updated_at, opportunityTitles: draftOpportunityTitles(d), opportunityIds: draftOpportunityIds(d) });
 async function body(req) {
   let length = 0; const chunks = [];
   for await (const chunk of req) { length += chunk.length; assert(length <= 32768, 413, 'Request too large.'); chunks.push(chunk); }

@@ -1,0 +1,141 @@
+{
+  "root": {
+    "type": "root",
+    "version": 1,
+    "direction": "ltr",
+    "format": "",
+    "indent": 0,
+    "children": [
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImhlYWRlci1sb2dvIiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><img src=\"https://example.com/header_logo_url\" alt=\"\" width=\"520\" style=\"max-width:100%;height:auto\">"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImVkaXRvcnMtbm90ZSIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><div style=\"padding:20px;background:#f6f6f8\"><p><em>[Replace editors note body]</em></p><p><span style=\"background-color: rgb(255,249,148)\"><em>[Replace editors note tagline]</em></span></p><p><em>Until next Wednesday, — Priscila Brito</em></p></div>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InNlY3Rpb24taGVhZGVyLWluc2lnaHRzIiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><h1>INSIGHTS</h1>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImRpdmlkZXItMyIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><hr style=\"border:0;border-top:1px solid #ddd\">"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InN1YnNlY3Rpb24taGVhZGVyLXJlc2VhcmNoIiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><h3>RESEARCH</h3>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6Imluc2lnaHRzLXJvdyIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"table-layout:fixed;border-collapse:collapse\"><tbody><tr><td width=\"33.333333333333336%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"insights-row-item-1\"><p><strong>DESIGN</strong></p><p>[Replace item body before link]<a href=\"https://example.com/Research/1\">Research item 1</a>[Replace item body after link]</p><p><span style=\"color: rgb(112,112,112)\"><em>by Source 1</em></span></p></div></td><td width=\"33.333333333333336%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"insights-row-item-2\"><p><strong>DESIGN</strong></p><p>[Replace item body before link]<a href=\"https://example.com/Research/2\">Research item 2</a>[Replace item body after link]</p><p><span style=\"color: rgb(112,112,112)\"><em>by Source 2</em></span></p></div></td><td width=\"33.333333333333336%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"insights-row-item-3\"><p><strong>DESIGN</strong></p><p>[Replace item body before link]<a href=\"https://example.com/Research/3\">Research item 3</a>[Replace item body after link]</p><p><span style=\"color: rgb(112,112,112)\"><em>by Source 3</em></span></p></div></td></tr></tbody></table>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InN1cnZleS1jdGEtcm93IiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"table-layout:fixed;border-collapse:collapse\"><tbody><tr><td width=\"50%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"survey-cta-row-item-1\"><p><em>[Replace survey text]</em><a href=\"https://example.com/contact_url\"><em>contact us</em></a></p></div></td><td width=\"50%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"survey-cta-row-item-2\"><p style=\"text-align:center\"><a style=\"display:inline-block;padding:12px 20px;background:#007ca3;color:white\" href=\"https://example.com/survey_url\">take our survey</a></p></div></td></tr></tbody></table>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InNlY3Rpb24taGVhZGVyLWNhc2VzIiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><h2>CASES</h2>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImNhc2VzLXJvdyIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"table-layout:fixed;border-collapse:collapse\"><tbody><tr><td width=\"33.333333333333336%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"cases-row-item-1\"><p><strong>DESIGN</strong></p><p>[Replace item body before link]<a href=\"https://example.com/Case/1\">Case item 1</a>[Replace item body after link]</p><p><span style=\"color:#707070\"><em>by Source 1</em></span></p></div></td><td width=\"33.333333333333336%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"cases-row-item-2\"><p><strong>DESIGN</strong></p><p>[Replace item body before link]<a href=\"https://example.com/Case/2\">Case item 2</a>[Replace item body after link]</p><p><span style=\"color:#707070\"><em>by Source 2</em></span></p></div></td><td width=\"33.333333333333336%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"cases-row-item-3\"><p><strong>DESIGN</strong></p><p>[Replace item body before link]<a href=\"https://example.com/Case/3\">Case item 3</a>[Replace item body after link]</p><p><span style=\"color:#707070\"><em>by Source 3</em></span></p></div></td></tr></tbody></table>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InNlY3Rpb24taGVhZGVyLXJlc291cmNlcyIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><h1>RESOURCES</h1>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImRpdmlkZXItMTAiLCJpc3N1ZUlkIjoiaWpuZXQtYmx1ZXByaW50cy10ZXN0LTAwMSIsImxvY2FsZSI6ImVuIiwiZWRpdGlvbiI6ImJsdWVwcmludHMifQ--><hr style=\"border:0;border-top:1px solid #ddd\">"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InN1YnNlY3Rpb24taGVhZGVyLWJyZWFrZG93bnMiLCJpc3N1ZUlkIjoiaWpuZXQtYmx1ZXByaW50cy10ZXN0LTAwMSIsImxvY2FsZSI6ImVuIiwiZWRpdGlvbiI6ImJsdWVwcmludHMifQ--><h2>BREAKDOWNS</h2>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImJyZWFrZG93bnMtcm93IiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"table-layout:fixed;border-collapse:collapse\"><tbody><tr><td width=\"66.67%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"breakdowns-row-item-1\"><p><strong>DESIGN</strong></p><p><a href=\"https://example.com/Breakdown/1\">Breakdown item 1</a>[Replace item body]</p><p><span style=\"color: rgb(112,112,112)\"><em>by Source 1</em></span></p></div></td><td width=\"33.33%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"breakdowns-row-item-2\"><p><strong>DESIGN</strong></p><p>[Replace item body before link]<a href=\"https://example.com/Breakdown/2\">Breakdown item 2</a>[Replace item body after link]</p><p><span style=\"color: rgb(112,112,112)\"><em>by Source 2</em></span></p></div></td></tr></tbody></table>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InNwb3RsaWdodCIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><div style=\"padding:20px;border:4px double #00a3d4\"><h3><span style=\"color: rgb(4,178,245)\">SPOTLIGHT</span></h3><p><span style=\"color: rgb(4,178,245)\"><strong>DESIGN</strong></span></p><p><em><strong>The What: </strong></em>[Replace spotlight what before link]<a href=\"https://example.com/spotlight_url\">[Replace spotlight link text]</a>[Replace spotlight what after link]</p><p><em><strong>The How: </strong></em>[Replace spotlight how]</p><p><em><strong>The Why: </strong></em>[Replace spotlight why]</p></div>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InNlY3Rpb24taGVhZGVyLXVwZGF0ZXMiLCJpc3N1ZUlkIjoiaWpuZXQtYmx1ZXByaW50cy10ZXN0LTAwMSIsImxvY2FsZSI6ImVuIiwiZWRpdGlvbiI6ImJsdWVwcmludHMifQ--><h1>UPDATES</h1>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImRpdmlkZXItMTUiLCJpc3N1ZUlkIjoiaWpuZXQtYmx1ZXByaW50cy10ZXN0LTAwMSIsImxvY2FsZSI6ImVuIiwiZWRpdGlvbiI6ImJsdWVwcmludHMifQ--><hr style=\"border:0;border-top:1px solid #ddd\">"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InVwZGF0ZXMtcm93IiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"table-layout:fixed;border-collapse:collapse\"><tbody><tr><td width=\"50%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"updates-row-item-1\"><h3>TAKEAWAYS</h3><ul><li>from Research source: <a href=\"https://example.com/takeaway\">Example takeaway</a></li></ul></div></td><td width=\"50%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"><div data-ijnet-element=\"updates-row-item-2\"><h3>ANNOUNCEMENTS</h3><ul><li>from News source: <a href=\"https://example.com/announcement\">Example announcement</a></li></ul></div></td></tr></tbody></table>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InNlY3Rpb24taGVhZGVyLW9wcG9ydHVuaXRpZXMiLCJpc3N1ZUlkIjoiaWpuZXQtYmx1ZXByaW50cy10ZXN0LTAwMSIsImxvY2FsZSI6ImVuIiwiZWRpdGlvbiI6ImJsdWVwcmludHMifQ--><h1>OPPORTUNITIES</h1>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImRpdmlkZXItMTgiLCJpc3N1ZUlkIjoiaWpuZXQtYmx1ZXByaW50cy10ZXN0LTAwMSIsImxvY2FsZSI6ImVuIiwiZWRpdGlvbiI6ImJsdWVwcmludHMifQ--><hr style=\"border:0;border-top:1px solid #ddd\">"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6Im9wcG9ydHVuaXRpZXMtZ3JpZCIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyIsIml0ZW1zIjpbXX0--><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"table-layout:fixed;border-collapse:collapse\"><tbody><tr><td width=\"25%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"></td><td width=\"25%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"></td><td width=\"25%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"></td><td width=\"25%\" valign=\"top\" style=\"padding:10px;overflow-wrap:anywhere\"></td></tr></tbody></table>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImZvb3Rlci1kaXZpZGVyIiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><hr style=\"border:0;border-top:1px solid #00a3d4\">"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6ImZvb3Rlci1saW5rcyIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><p><em>Not displaying properly? <a href=\"https://example.com/view_url\">View</a> this email in your browser. Was this a forward? <a href=\"https://example.com/subscribe_url\">Subscribe</a> here. Not vibing with our emails? <a href=\"https://example.com/unsubscribe_url\">Unsubscribe</a> anytime. Found this useful? <a href=\"https://example.com/forward_url\">Share</a> it. Want to change how you get these emails? <a href=\"https://example.com/preferences_url\">Update</a> preferences.</em></p>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InNvY2lhbC1pY29ucyIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><p><a href=\"https://example.com/facebook_url\">Facebook</a> · <a href=\"https://example.com/instagram_url\">Instagram</a> · <a href=\"https://example.com/x_url\">X</a></p>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InB1Ymxpc2hlci1jb3B5cmlnaHQiLCJpc3N1ZUlkIjoiaWpuZXQtYmx1ZXByaW50cy10ZXN0LTAwMSIsImxvY2FsZSI6ImVuIiwiZWRpdGlvbiI6ImJsdWVwcmludHMifQ--><p>Published by International Center for Journalists. Copyright © 2026 all rights reserved. IJNet material may not be reproduced or republished without express written permission.</p>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InN1cHBvcnRlZC1ieS1sYWJlbCIsImlzc3VlSWQiOiJpam5ldC1ibHVlcHJpbnRzLXRlc3QtMDAxIiwibG9jYWxlIjoiZW4iLCJlZGl0aW9uIjoiYmx1ZXByaW50cyJ9--><p>Supported by</p>"
+      },
+      {
+        "type": "html",
+        "version": 1,
+        "html": "<!--ijnet:eyJ2ZXJzaW9uIjoxLCJpZCI6InN1cHBvcnRlci1sb2dvIiwiaXNzdWVJZCI6ImlqbmV0LWJsdWVwcmludHMtdGVzdC0wMDEiLCJsb2NhbGUiOiJlbiIsImVkaXRpb24iOiJibHVlcHJpbnRzIn0--><img src=\"https://example.com/supporter_logo_url\" alt=\"\" width=\"106\" style=\"max-width:100%;height:auto\">"
+      }
+    ]
+  }
+}
