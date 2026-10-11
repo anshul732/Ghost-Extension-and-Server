@@ -10,9 +10,11 @@ function fixture() {
   const area = data => ({ async get(keys) { if (typeof keys === 'string') return { [keys]: data[keys] }; return Object.fromEntries(keys.map(k => [k, data[k]])); }, async set(values) { Object.assign(data, values); }, async remove(keys) { for (const k of Array.isArray(keys) ? keys : [keys]) delete data[k]; }, async setAccessLevel() {} });
   const base = 'chrome-extension://test-extension/';
   const chrome = { runtime: { id: 'test-extension', getURL: path => base + path, onMessage: { addListener(fn) { listener = fn; } }, onInstalled: { addListener() {} }, async openOptionsPage() {} }, action: { onClicked: { addListener() {} } }, storage: { local: area(local), session: area(session) }, permissions: { async contains() { return true; } }, scripting: { async unregisterContentScripts() {}, async registerContentScripts() { if (failRegistration) throw new Error('Registration failed'); } } };
-  runInNewContext(source, { chrome, URL, AbortSignal, fetch: async (url, init) => { calls.push({ url, init }); return { ok: true, async json() { return { editor: 'Test editor' }; } }; } });
+  const timeouts = [];
+  const signals = { timeout(ms) { timeouts.push(ms); return AbortSignal.timeout(ms); } };
+  runInNewContext(source, { chrome, URL, AbortSignal: signals, fetch: async (url, init) => { calls.push({ url, init }); return { ok: true, async json() { return { editor: 'Test editor' }; } }; } });
   const dispatch = (payload, sender = { id: chrome.runtime.id, url: base + 'options.html' }) => new Promise(resolve => { if (listener(payload, sender, resolve) !== true) resolve({ ignored: true }); });
-  return { local, session, dispatch, calls, base, failRegistration() { failRegistration = true; } };
+  return { local, session, dispatch, calls, timeouts, base, failRegistration() { failRegistration = true; } };
 }
 test('background rejects panels embedded outside the configured Ghost origin', async () => {
   const f = fixture();
@@ -20,6 +22,16 @@ test('background rejects panels embedded outside the configured Ghost origin', a
   assert.equal(result.ok, false); assert.match(result.error, /configured Ghost/); assert.equal(f.calls.length, 0);
   const trusted = await f.dispatch({ type: 'api', path: '/session' }, { id: 'test-extension', url: f.base + 'panel.html', tab: { url: 'https://ghost.example.com/ghost/#/editor/post/123' } });
   assert.equal(trusted.ok, true); assert.equal(f.calls.length, 1);
+});
+test('background waits longer for relevance than the server can spend scoring', async () => {
+  const f = fixture();
+  await f.dispatch({ type: 'api', path: '/opportunities' });
+  await f.dispatch({ type: 'api', path: '/relevance' });
+  const [ordinary, relevance] = f.timeouts;
+  assert.equal(ordinary, 25000);
+  // Must clear the model's own 30s ceiling in server/llm.js, or the panel aborts a
+  // request the server finishes and caches — leaving the queue unranked.
+  assert.ok(relevance > 30000, `relevance budget ${relevance} must exceed the 30s model timeout`);
 });
 test('background never sends a token to a server other than the one it was issued for', async () => {
   const f = fixture(); f.local.settings.serverUrl = 'https://different.example.com';

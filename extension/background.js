@@ -1,4 +1,11 @@
 const defaults = { serverUrl: '', ghostUrl: '' };
+// Relevance is the one slow route: the server runs a full Airtable scan and then a
+// model call with its own 30s ceiling (server/llm.js), so a 25s budget here would
+// abort a request the server goes on to finish and cache. Mirrored in bridge.js,
+// which the service worker cannot import.
+const TIMEOUT_MS = 25000;
+const RELEVANCE_TIMEOUT_MS = 45000;
+const timeoutFor = path => /^\/relevance(\?|$)/.test(path) ? RELEVANCE_TIMEOUT_MS : TIMEOUT_MS;
 const settings = async () => ({ ...defaults, ...(await chrome.storage.local.get('settings')).settings });
 function validUrl(value, ghost = false) {
   const url = new URL(value);
@@ -59,7 +66,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       const { method = 'GET', path, body, requestId } = message;
       const permitted = (method === 'GET' && (['/session', '/opportunities', '/drafts', '/activity'].includes(path) || /^\/relevance(\?|$)/.test(path))) || (method === 'PATCH' && /^\/opportunities\/[\w-]+$/.test(path)) || (method === 'POST' && (/^\/drafts\/[\w-]+\/(add|swap)$/.test(path) || path === '/commands/preview'));
       if (!permitted) throw new Error('Unsupported action.');
-      const response = await fetch(`${serverUrl}/api${path}`, { method, headers: { Authorization: `Bearer ${editorToken}`, 'Content-Type': 'application/json', ...(requestId ? { 'Idempotency-Key': requestId } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(25000), redirect: 'error' });
+      const response = await fetch(`${serverUrl}/api${path}`, { method, headers: { Authorization: `Bearer ${editorToken}`, 'Content-Type': 'application/json', ...(requestId ? { 'Idempotency-Key': requestId } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(timeoutFor(path)), redirect: 'error' });
       const result = await response.json();
       if (!response.ok) { if (response.status === 401) await chrome.storage.session.remove(['editorToken', 'tokenServer']); throw new Error(result.error || `Server returned ${response.status}.`); }
       return result;

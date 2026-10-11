@@ -27,14 +27,24 @@ async function load(quiet = false) {
 // Suggestion scoring (urgency + reach + funder) is optional and must never block or
 // break the panel. It runs after the main render and re-renders when results arrive.
 // Excluded opportunities (e.g. blocked-country funders) are hidden from every view.
-async function loadRelevance() {
+// The server caches scores even when this request gives up on it, so one quiet
+// retry usually lands on a warm cache instead of leaving the panel date-ordered
+// until the next refresh. Only the newest attempt may write to state.
+let relevanceRun = 0;
+async function loadRelevance(retry = true) {
   if (!state.connected) return;
+  const run = ++relevanceRun;
   try {
     const { scores, excluded } = await api('/relevance');
+    if (run !== relevanceRun) return;
     state.scores = scores || {};
     state.excluded = excluded || [];
     render();
-  } catch { /* scoring unavailable — keep the date-ordered fallback */ }
+  } catch { /* scoring unavailable — keep the date-ordered fallback */
+    if (!retry || run !== relevanceRun) return;
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    if (run === relevanceRun) await loadRelevance(false);
+  }
 }
 function markOffline(error) { state.connected = false; $('#connection').textContent = 'CONNECTION NEEDS ATTENTION'; $('#live-dot').classList.remove('online'); notify(error.message, true); }
 async function run(task, errorTarget) {

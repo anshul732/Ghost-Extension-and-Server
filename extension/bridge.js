@@ -1,4 +1,8 @@
 const extension = typeof chrome !== 'undefined' && !!chrome.runtime?.id;
+// Kept in step with background.js, which cannot import this module.
+const TIMEOUT_MS = 25000;
+const RELEVANCE_TIMEOUT_MS = 45000;
+const timeoutFor = path => /^\/relevance(\?|$)/.test(path) ? RELEVANCE_TIMEOUT_MS : TIMEOUT_MS;
 let demoToken;
 export async function message(payload) {
   if (extension) {
@@ -13,7 +17,7 @@ export async function message(payload) {
     const response = await fetch('/api/demo-session', { method: 'POST', headers: { 'X-Demo-Request': '1' } });
     const result = await response.json(); if (!response.ok) throw new Error(result.error); demoToken = result.token;
   }
-  const response = await fetch(`/api${payload.path}`, { method: payload.method || 'GET', headers: { Authorization: `Bearer ${demoToken}`, 'Content-Type': 'application/json', ...(payload.requestId ? { 'Idempotency-Key': payload.requestId } : {}) }, ...(payload.body ? { body: JSON.stringify(payload.body) } : {}), signal: AbortSignal.timeout(25000) });
+  const response = await fetch(`/api${payload.path}`, { method: payload.method || 'GET', headers: { Authorization: `Bearer ${demoToken}`, 'Content-Type': 'application/json', ...(payload.requestId ? { 'Idempotency-Key': payload.requestId } : {}) }, ...(payload.body ? { body: JSON.stringify(payload.body) } : {}), signal: AbortSignal.timeout(timeoutFor(payload.path)) });
   const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Server request failed.'); return result;
 }
 export const api = (path, method = 'GET', body) => message({ type: 'api', path, method, body, ...(method !== 'GET' ? { requestId: crypto.randomUUID() } : {}) });
